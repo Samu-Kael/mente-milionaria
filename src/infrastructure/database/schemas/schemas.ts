@@ -11,17 +11,16 @@ export const categorias = sqliteTable('categorias', {
 export const receitas = sqliteTable('receitas', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   descricao: text('descricao').notNull(),
-  valor: real('valor').notNull(),
-  data: integer('data', { mode: 'timestamp' }).notNull(),
-  categoriaId: integer('categoria_id').notNull().references(() => categorias.id),
+  valor: integer('valor').notNull(),
+data: text("data").notNull(),
 });
 
 // 3. TABELA DE DESPESAS
 export const despesas = sqliteTable('despesas', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   descricao: text('descricao').notNull(),
-  valor: real('valor').notNull(),
-  data: integer('data', { mode: 'timestamp' }).notNull(),
+  valor: integer('valor').notNull(),
+  data: text('data').notNull(),
   categoriaId: integer('categoria_id').notNull().references(() => categorias.id),
 });
 

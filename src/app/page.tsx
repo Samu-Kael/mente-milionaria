@@ -1,6 +1,18 @@
 import { acaoCriarReceita } from "@/actions/receitas/create-receitas.action";
+import { db } from "@/infrastructure/database/client";
+import { receitas } from "@/infrastructure/database/schemas/schemas";
+import { garantirCategoriasIniciais } from "@/infrastructure/persistence/repositories/repositorio-categoria-drizzle";
 
-export default function HomePage() {
+export default async function HomePage() {
+  // 1. Executa o seed automático para garantir as categorias no banco antes de tudo
+  await garantirCategoriasIniciais();
+
+  // 2. Busca todas as receitas cadastradas diretamente do banco de dados
+  const listaReceitas = await db.select().from(receitas);
+
+  // 3. Calcula o total somando os valores (dividido por 100, pois salvamos em centavos)
+  const totalRecebido = listaReceitas.reduce((acumulador, item) => acumulador + item.valor, 0) / 100;
+
   return (
     <div className="min-h-screen bg-gray-950 text-white flex flex-col items-center justify-start p-6 font-sans">
       <div className="w-full max-w-4xl mt-6">
@@ -62,7 +74,7 @@ export default function HomePage() {
                   type="number" 
                   name="categoriaId" 
                   required
-                  placeholder="Ex: 1" 
+                  placeholder="Ex: 1 (Salário), 2 (Investimentos)..." 
                   className="w-full bg-gray-950 border border-gray-800 rounded-lg p-2.5 text-white focus:outline-none focus:border-emerald-500 transition-colors"
                 />
               </div>
@@ -80,7 +92,10 @@ export default function HomePage() {
           <div className="space-y-4">
             <div className="p-4 bg-gray-900 rounded-xl border border-gray-800 shadow-md">
               <h3 className="text-gray-500 text-xs font-semibold uppercase">Total Recebido</h3>
-              <p className="text-2xl font-bold text-emerald-400 mt-1">R$ --,--</p>
+              {/* Exibe o valor total dinamicamente formatado em formato de moeda brasileira */}
+              <p className="text-2xl font-bold text-emerald-400 mt-1">
+                {totalRecebido.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+              </p>
             </div>
             
             <div className="p-4 bg-gray-900 rounded-xl border border-gray-800 shadow-md">
