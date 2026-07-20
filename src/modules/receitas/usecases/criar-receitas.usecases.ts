@@ -1,20 +1,11 @@
+import { IReceitaRepository } from "../repositories/repositorio-receita";
 import { CriarReceitaDTO } from "../dto/criar-receita.dto";
 
-export interface IReceitaRepository {
-  salvar(dados: CriarReceitaDTO): Promise<void>;
-}
-
 export class CriarReceitaUseCase {
-  constructor(private readonly repositorio: IReceitaRepository) {}
+  constructor(private receitaRepository: IReceitaRepository) {}
 
-  async executar(dados: CriarReceitaDTO) {
-
-    await this.repositorio.salvar(dados);
-
-    return {
-      sucesso: true,
-      mensagem: "Receita criada com sucesso!",
-      receita: dados
-    };
+  async executar(dto: CriarReceitaDTO): Promise<void> {
+   
+    await this.receitaRepository.criar(dto);
   }
 }

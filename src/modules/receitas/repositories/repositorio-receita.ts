@@ -1,15 +1,7 @@
-import { db } from "@/infrastructure/database/client";
-import { receitas } from "@/infrastructure/database/schemas/schemas";
+import { Transacao } from "@/core/tipos";
 import { CriarReceitaDTO } from "../dto/criar-receita.dto";
-import { IReceitaRepository } from "../usecases/criar-receitas.usecases";
 
-export class ReceitaRepositoryDrizzle implements IReceitaRepository {
-  async salvar(dados: CriarReceitaDTO): Promise<void> {
-    await db.insert(receitas).values({
-      descricao: dados.descricao,
-      valor: dados.valor,
-      data: dados.data, 
-      categoriaId: dados.categoriaId,
-    });
-  }
+export interface IReceitaRepository {
+  criar(dados: CriarReceitaDTO): Promise<void>;
+  listarTodas(): Promise<Transacao[]>;
 }

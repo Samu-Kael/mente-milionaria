@@ -1,16 +1,35 @@
+import Image from "next/image";
+
 export function Header() {
   return (
-    <header className="w-full bg-gray-900 border-b border-gray-800 h-16 flex items-center justify-between px-6">
-      <div>
-        <h1 className="text-base font-bold text-gray-200">Visão Geral</h1>
-        <p className="text-xs text-gray-500">Bem-vindo ao seu controle financeiro</p>
+    <header className="flex items-center justify-between bg-gray-900 border-b border-gray-800 px-6 py-4 h-16">
+      <div className="flex items-center gap-3">
+        <Image 
+          src="/images/logo.png" 
+          alt="Logo Mente Milionária" 
+          width={32} 
+          height={32}
+          className="object-contain"
+        />
+        <span className="text-white font-bold text-lg tracking-wider">
+          MENTE MILIONÁRIA
+        </span>
       </div>
 
-      <div className="flex items-center space-x-4">
-        {/* Status discreto integrado ao Header */}
-        <div className="flex items-center space-x-2 bg-gray-950 px-3 py-1.5 rounded-full border border-gray-800">
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="text-xs text-gray-400 font-medium">Bando de Dados Local</span>
+      <div className="flex items-center gap-3">
+        <div className="text-right hidden sm:block">
+          <p className="text-sm font-medium text-white">Usuário Master</p>
+          <p className="text-xs text-emerald-500">Premium</p>
+        </div>
+        
+        <div className="w-9 h-9 rounded-full border border-gray-700 overflow-hidden relative flex items-center justify-center">
+          <Image 
+            src="/images/avatar.png" 
+            alt="Avatar do Usuário" 
+            width={36} 
+            height={36}
+            className="object-cover w-full h-full"
+          />
         </div>
       </div>
     </header>

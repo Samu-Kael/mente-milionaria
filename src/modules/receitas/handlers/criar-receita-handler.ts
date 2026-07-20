@@ -1,12 +1,30 @@
-import { criarReceitaSchema } from "../dto/criar-receita.dto"; 
+import { repositorioReceitaDrizzle } from "@/infrastructure/persistence/repositories/repositorio-receita-drizzle";
+import { validarCriarReceita } from "../dto/criar-receita.dto";
 import { CriarReceitaUseCase } from "../usecases/criar-receitas.usecases";
 
-import { ReceitaRepositoryDrizzle } from "../repositories/repositorio-receita";
+export async function criarReceitaHandler(formData: FormData): Promise<{ sucesso: boolean; erro?: string }> {
+  try {
+    const dadosBrutos = {
+      descricao: formData.get("descricao"),
+      valor: formData.get("valor"),
+      data: formData.get("data"),
+      categoriaId: formData.get("categoriaId"),
+    };
 
-export async function criarReceitaHandler(dadosBrutos: unknown) {
-  const dadosValidados = criarReceitaSchema.parse(dadosBrutos); 
-  const repositorio = new ReceitaRepositoryDrizzle();
-  const useCase = new CriarReceitaUseCase(repositorio);
+    // 1. Valida os dados vindo da interface
+    const dadosValidados = validarCriarReceita(dadosBrutos);
 
-  return await useCase.executar(dadosValidados);
+    // 2. Instancia o Caso de Uso passando o repositório correto
+    const useCase = new CriarReceitaUseCase(repositorioReceitaDrizzle);
+
+    // 3. Executa a gravação no banco
+    await useCase.executar(dadosValidados);
+
+    return { sucesso: true };
+  } catch (error: any) {
+    return { 
+      sucesso: false, 
+      erro: error.message || "Erro inesperado ao registrar a receita." 
+    };
+  }
 }

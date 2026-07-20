@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -17,11 +13,16 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
+    
+    /* Mapeamento de Caminhos (sem depender de baseUrl) */
     "paths": {
-      "@/*": [
-        "./src/*"
-      ]
+      "@/*": ["./src/*"]
     },
+    
+    /* Segurança e Padronização */
+    "forceConsistentCasingInFileNames": true,
+
+    /* Plugins */
     "plugins": [
       {
         "name": "next"
