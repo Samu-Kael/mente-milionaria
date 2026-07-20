@@ -7,8 +7,8 @@ export class ReceitaRepositoryDrizzle implements IReceitaRepository {
   async salvar(dados: CriarReceitaDTO): Promise<void> {
     await db.insert(receitas).values({
       descricao: dados.descricao,
-      valor: dados.valor, // Valor inteiro em centavos vindo da Action
-      data: dados.data,   // Objeto Date aceito pelo mode: 'timestamp' do Drizzle
+      valor: dados.valor,
+      data: dados.data, 
       categoriaId: dados.categoriaId,
     });
   }
