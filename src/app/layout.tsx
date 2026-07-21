@@ -1,4 +1,4 @@
-import '../assets/styles/globals.css';
+import '@/assets/styles/globals.css';
 
 export const metadata = {
   title: "Mente Milionária",

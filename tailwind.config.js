@@ -1,16 +1,13 @@
-/** @type {import('tailwindcss').Config} */
-module.exports = {
+import type { Config } from "tailwindcss";
+
+const config: Config = {
   content: [
-    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/core/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/modules/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/shared/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/**/*.{js,ts,jsx,tsx,mdx}", // Pega todas as pastas dentro de src
   ],
   theme: {
     extend: {},
   },
   plugins: [],
-}
+};
+
+export default config;
