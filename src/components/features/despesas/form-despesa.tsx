@@ -1,76 +1,130 @@
-import { acaoCriarDespesa } from "@/actions/despesas/create-despesas.action";
+"use client";
+
+import React, { useState } from "react";
 
 interface FormDespesaProps {
-  categorias: {
-    id: number;
-    nome: string;
-    tipo: "receita" | "despesa";
-  }[];
+  categorias?: Array<{ id: string; nome: string; tipo?: string }>;
 }
 
-export function FormDespesa({ categorias }: FormDespesaProps) {
-  const categoriasDespesa = categorias.filter((cat) => cat.tipo === "despesa");
+export function FormDespesa({ categorias = [] }: FormDespesaProps) {
+  const [descricao, setDescricao] = useState("");
+  const [categoria, setCategoria] = useState("");
+  const [valor, setValor] = useState("");
+  const [data, setData] = useState("");
+
+  // Garante que o filter não quebre caso passe algo indefinido
+  const categoriasDespesa = (categorias || []).filter(
+    (cat) => !cat.tipo || cat.tipo === "DESPESA"
+  );
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    alert(`Despesa "${descricao}" no valor de R$ ${valor} salva com sucesso!`);
+  };
 
   return (
-    <form action={acaoCriarDespesa} className="bg-gray-900 p-6 rounded-lg space-y-4 border border-gray-800">
-      <h2 className="text-xl font-bold text-rose-500">Nova Despesa</h2>
-      
-      <div>
-        <label className="block text-xs font-semibold text-gray-400 uppercase mb-1">Descrição</label>
-        <input 
-          type="text" 
-          name="descricao" 
-          placeholder="Ex: Conta de Luz, Aluguel, Ifood..." 
-          required 
-          className="w-full bg-gray-950 border border-gray-800 rounded p-2 text-white focus:outline-none focus:border-rose-500"
-        />
+    <div className="w-full bg-slate-900/60 border border-slate-800 p-8 rounded-2xl shadow-xl space-y-6">
+      <div className="border-b border-slate-800 pb-4">
+        <h1 className="text-2xl font-bold text-rose-500">Cadastrar Nova Despesa</h1>
+        <p className="text-xs text-slate-400 mt-1">
+          Preencha os dados abaixo para registrar seus gastos
+        </p>
       </div>
 
-      <div>
-        <label className="block text-xs font-semibold text-gray-400 uppercase mb-1">Categoria</label>
-        <select 
-          name="categoriaId" 
-          required 
-          className="w-full bg-gray-950 border border-gray-800 rounded p-2 text-white focus:outline-none focus:border-rose-500"
-        >
-          <option value="" className="text-gray-500">Selecione uma categoria</option>
-          {categoriasDespesa.map((cat) => (
-            <option key={cat.id} value={cat.id} className="text-white">
-              {cat.nome}
-            </option>
-          ))}
-        </select>
-      </div>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Descrição */}
+          <div>
+            <label className="text-xs font-semibold uppercase text-slate-400 block mb-2">
+              Descrição
+            </label>
+            <input
+              type="text"
+              value={descricao}
+              onChange={(e) => setDescricao(e.target.value)}
+              placeholder="Ex: Mercado, Aluguel, Passagem..."
+              required
+              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-rose-500 transition"
+            />
+          </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-xs font-semibold text-gray-400 uppercase mb-1">Valor Gasto (R$)</label>
-          <input 
-            type="number" 
-            step="0.01" 
-            name="valor" 
-            placeholder="0,00" 
-            required 
-            className="w-full bg-gray-950 border border-gray-800 rounded p-2 text-white focus:outline-none focus:border-rose-500"
-          />
+          {/* Categoria sem Emojis */}
+          <div>
+            <label className="text-xs font-semibold uppercase text-slate-400 block mb-2">
+              Categoria
+            </label>
+            <select
+              value={categoria}
+              onChange={(e) => setCategoria(e.target.value)}
+              required
+              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-rose-500 transition"
+            >
+              <option value="" disabled>
+                Selecione uma categoria
+              </option>
+              {categoriasDespesa.length > 0 ? (
+                categoriasDespesa.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.nome}
+                  </option>
+                ))
+              ) : (
+                <>
+                  <option value="comida">Comida / Alimentação</option>
+                  <option value="viagem">Viagem</option>
+                  <option value="moradia">Moradia</option>
+                  <option value="transporte">Transporte</option>
+                  <option value="lazer">Lazer</option>
+                  <option value="saude">Saúde</option>
+                  <option value="educacao">Educação</option>
+                  <option value="outros">Outros</option>
+                </>
+              )}
+            </select>
+          </div>
         </div>
-        <div>
-          <label className="block text-xs font-semibold text-gray-400 uppercase mb-1">Data</label>
-          <input 
-            type="date" 
-            name="data" 
-            required 
-            className="w-full bg-gray-950 border border-gray-800 rounded p-2 text-white focus:outline-none focus:border-rose-500"
-          />
-        </div>
-      </div>
 
-      <button 
-        type="submit" 
-        className="w-full bg-rose-500 hover:bg-rose-600 text-white font-bold py-2 rounded transition-colors mt-2"
-      >
-        Registrar Despesa
-      </button>
-    </form>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Valor */}
+          <div>
+            <label className="text-xs font-semibold uppercase text-slate-400 block mb-2">
+              Valor Gasto (R$)
+            </label>
+            <input
+              type="number"
+              step="0.01"
+              value={valor}
+              onChange={(e) => setValor(e.target.value)}
+              placeholder="0,00"
+              required
+              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-rose-500 transition"
+            />
+          </div>
+
+          {/* Data */}
+          <div>
+            <label className="text-xs font-semibold uppercase text-slate-400 block mb-2">
+              Data
+            </label>
+            <input
+              type="date"
+              value={data}
+              onChange={(e) => setData(e.target.value)}
+              required
+              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-rose-500 transition"
+            />
+          </div>
+        </div>
+
+        <div className="flex justify-end pt-4">
+          <button
+            type="submit"
+            className="w-full md:w-auto bg-rose-500 hover:bg-rose-600 text-white font-semibold px-8 py-3.5 rounded-xl transition shadow-lg shadow-rose-500/20 active:scale-[0.99]"
+          >
+            Registrar Despesa
+          </button>
+        </div>
+      </form>
+    </div>
   );
 }

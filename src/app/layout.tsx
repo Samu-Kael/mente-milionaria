@@ -1,5 +1,4 @@
-import { AppShell } from "@/core/app-shell";
-import "@/assets/styles/globals.css";
+import '../assets/styles/globals.css';
 
 export const metadata = {
   title: "Mente Milionária",
@@ -15,11 +14,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="pt-BR">
-      <body>
-        <AppShell>
-          {children}
-        </AppShell>
+    <html lang="pt-BR" className="dark">
+      <body className="bg-gray-950 text-gray-100 min-h-screen antialiased">
+        {children}
       </body>
     </html>
   );

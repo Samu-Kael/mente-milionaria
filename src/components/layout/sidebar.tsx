@@ -1,42 +1,92 @@
+"use client";
+
+import React, { useState } from "react";
+import { LayoutDashboard, PlusCircle, Bell, Settings, X } from "lucide-react";
+import { FormDespesa } from "@/components/features/despesas/form-despesa";
+
 export function Sidebar() {
+  const [showFormDespesa, setShowFormDespesa] = useState(false);
+
   return (
-    <aside className="w-64 bg-gray-900 border-r border-gray-800 flex-col justify-between p-6 h-full md:flex hidden">
-      <div className="space-y-8">
-        {/* Logo / Branding */}
-        <div className="flex items-center space-x-2">
-          <span className="text-2xl">🧠</span>
-          <span className="text-lg font-black tracking-wider bg-linear-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
-            MM FLOATS
-          </span>
+    <>
+      <aside className="w-64 bg-slate-950 border-r border-slate-900 flex flex-col justify-between p-4 min-h-screen">
+        <div className="space-y-6">
+          {/* Logo */}
+          <div className="flex items-center gap-3 px-2">
+            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold text-lg">
+              🧠
+            </div>
+            <span className="font-bold text-white tracking-wide">
+              Mente Milionária
+            </span>
+          </div>
+
+          {/* Menus de Navegação */}
+          <nav className="flex flex-col gap-2">
+            {/* Dashboard */}
+            <button className="flex items-center gap-3 px-4 py-3 rounded-xl bg-emerald-500/10 text-emerald-400 font-medium text-sm transition">
+              <LayoutDashboard className="w-5 h-5" />
+              <span>Dashboard</span>
+            </button>
+
+            {/* BOTÃO NOVA DESPESA (Abre/Fecha o formulário) */}
+            <button
+              onClick={() => setShowFormDespesa(!showFormDespesa)}
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition ${
+                showFormDespesa
+                  ? "bg-rose-500/20 text-rose-400"
+                  : "text-rose-500 hover:bg-rose-500/10"
+              }`}
+            >
+              <PlusCircle className="w-5 h-5" />
+              <span>Nova Despesa</span>
+            </button>
+
+            {/* Metas */}
+            <button className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-slate-900/50 text-sm transition">
+              <Bell className="w-5 h-5" />
+              <span>Metas</span>
+            </button>
+
+            {/* Configurações */}
+            <button className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-slate-900/50 text-sm transition">
+              <Settings className="w-5 h-5" />
+              <span>Configurações</span>
+            </button>
+          </nav>
         </div>
 
-        {/* Links de Navegação */}
-        <nav className="space-y-2">
-          <a href="#" className="flex items-center space-x-3 bg-gray-950 text-emerald-400 p-3 rounded-xl font-medium text-sm border border-gray-800">
-            <span>📊</span>
-            <span>Dashboard</span>
-          </a>
-          <a href="#" className="flex items-center space-x-3 text-gray-400 hover:text-white hover:bg-gray-950 p-3 rounded-xl font-medium text-sm transition-colors">
-            <span>🎯</span>
-            <span>Metas</span>
-          </a>
-          <a href="#" className="flex items-center space-x-3 text-gray-400 hover:text-white hover:bg-gray-950 p-3 rounded-xl font-medium text-sm transition-colors">
-            <span>⚙️</span>
-            <span>Configurações</span>
-          </a>
-        </nav>
-      </div>
+        {/* Card do Usuário no rodapé da Sidebar */}
+        <div className="p-3 bg-slate-900/50 rounded-xl border border-slate-900 flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs">
+            U
+          </div>
+          <div className="flex flex-col">
+            <span className="text-xs font-semibold text-white">Usuário Pro</span>
+            <span className="text-[10px] text-slate-500">Mente Milionária</span>
+          </div>
+        </div>
+      </aside>
 
-      {/* Perfil do Usuário Simulado */}
-      <div className="border-t border-gray-800 pt-4 flex items-center space-x-3">
-        <div className="w-10 h-10 rounded-full bg-emerald-500 flex items-center justify-center font-bold text-gray-950">
-          U
+      {/* Painel Flutuante Lateral da Nova Despesa */}
+      {showFormDespesa && (
+        <div className="fixed inset-y-0 left-64 z-50 w-96 bg-slate-950/95 border-r border-slate-800 backdrop-blur-md p-6 shadow-2xl transition-all duration-300 flex flex-col overflow-y-auto">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-lg font-bold text-white flex items-center gap-2">
+              <PlusCircle className="w-5 h-5 text-rose-500" />
+              Nova Despesa
+            </h2>
+            <button
+              onClick={() => setShowFormDespesa(false)}
+              className="text-slate-400 hover:text-white transition p-1.5 rounded-lg hover:bg-slate-800"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          <FormDespesa categorias={[]} />
         </div>
-        <div>
-          <p className="text-sm font-semibold text-gray-200">Usuário Pro</p>
-          <p className="text-xs text-gray-500">Mente Milionária</p>
-        </div>
-      </div>
-    </aside>
+      )}
+    </>
   );
 }

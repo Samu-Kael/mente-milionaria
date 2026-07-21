@@ -1,16 +1,2 @@
-Plaintext
-
 node_modules/
 .next/
-out/
-# Arquivos de ambiente / credenciais sensíveis
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-#Banco de dados SQLite
-*.sqlite
-*.sqlite-journal
-.DS_Store
-Thumbs.db
