@@ -2,17 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
-  const authToken = request.cookies.get("auth_token")?.value;
-  const isLoginPage = request.nextUrl.pathname === "/";
-
-  if (!authToken && !isLoginPage) {
-    return NextResponse.redirect(new URL("/login", request.url));
-  }
-
-  if (authToken && isLoginPage) {
-    return NextResponse.redirect(new URL("/", request.url));
-  }
-
+  // Permite que todas as requisições passem livremente na raiz
   return NextResponse.next();
 }
 
