@@ -1,21 +1,24 @@
-import '@/assets/styles/globals.css';
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import '../assets/styles/globals.css';
 
-export const metadata = {
-  title: "Mente Milionária",
-  description: "Gerenciador de Finanças Pessoais",
-  icons: {
-    icon: "/images/logo.png",
-  }
+const inter = Inter({ subsets: ['latin'] });
+
+export const metadata: Metadata = {
+  title: 'Mente Milionária - Organizador de Finanças',
+  description: 'Sistema completo para organizar as suas finanças pessoais e metas.',
 };
 
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   return (
     <html lang="pt-BR" className="dark">
-      <body className="bg-gray-950 text-gray-100 min-h-screen antialiased">
+      <body
+        className={`${inter.className} bg-zinc-950 text-zinc-100 antialiased selection:bg-emerald-500 selection:text-zinc-950 min-h-screen`}
+      >
         {children}
       </body>
     </html>
