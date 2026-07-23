@@ -14,15 +14,12 @@
     "jsx": "preserve",
     "incremental": true,
     
-    /* Mapeamento de Caminhos (sem depender de baseUrl) */
     "paths": {
       "@/*": ["./src/*"]
     },
     
-    /* Segurança e Padronização */
     "forceConsistentCasingInFileNames": true,
 
-    /* Plugins */
     "plugins": [
       {
         "name": "next"

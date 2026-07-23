@@ -1,46 +1,67 @@
 "use client";
 
-import { LayoutDashboard, PlusCircle, Bell, Settings } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { LayoutDashboard, Target, Settings, Brain } from "lucide-react";
 
-export function Sidebar({ usuario }: any) {
+const navItems = [
+  { name: "Dashboard", href: "/", icon: LayoutDashboard },
+  { name: "Metas", href: "/metas", icon: Target },
+  { name: "Configurações", href: "/configuracoes", icon: Settings },
+];
+
+export function Sidebar() {
+  const pathname = usePathname();
+
   return (
-    <aside className="w-64 bg-black border-r border-zinc-900 flex flex-col p-4 min-h-screen">
-      <div className="flex items-center gap-2 mb-10 px-2">
-         <div className="w-8 h-8 bg-pink-500/20 rounded-lg flex items-center justify-center text-pink-500">🧠</div>
-         <span className="font-bold text-white">Mente Milionária</span>
+    <aside className="w-64 bg-[#0b0e14] border-r border-[#161b26] flex flex-col justify-between h-screen sticky top-0 p-4 shrink-0">
+      <div className="space-y-8">
+        {/* Topo: Logo & Nome */}
+        <div className="flex items-center gap-3 px-2 pt-2">
+          <div className="p-2 bg-emerald-500/10 rounded-xl text-emerald-400">
+            <Brain className="w-6 h-6" />
+          </div>
+          <div>
+            <h1 className="font-bold text-white text-base leading-tight">MM FLOATS</h1>
+            <span className="text-[10px] text-zinc-500 uppercase tracking-widest block font-medium">
+              Mente Milionária
+            </span>
+          </div>
+        </div>
+
+        {/* Links de Navegação */}
+        <nav className="space-y-1.5">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = pathname === item.href;
+
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                  isActive
+                    ? "bg-[#161b26] text-emerald-400 font-semibold"
+                    : "text-zinc-400 hover:text-white hover:bg-[#161b26]/50"
+                }`}
+              >
+                <Icon className={`w-4 h-4 ${isActive ? "text-emerald-400" : "text-zinc-400"}`} />
+                <span>{item.name}</span>
+              </Link>
+            );
+          })}
+        </nav>
       </div>
 
-      <nav className="flex flex-col gap-3 flex-1">
-        <button className="flex items-center gap-3 px-4 py-3 rounded-xl bg-emerald-500/10 text-emerald-500 font-bold text-sm">
-          <LayoutDashboard size={20} />
-          <span>Dashboard</span>
-        </button>
-
-        <button className="flex items-center gap-3 px-4 py-3 rounded-xl text-rose-500 hover:bg-rose-500/5 font-bold text-sm">
-          <PlusCircle size={20} />
-          <span>Nova Despesa</span>
-        </button>
-
-        <button className="flex items-center gap-3 px-4 py-3 rounded-xl text-zinc-500 hover:text-white transition font-bold text-sm">
-          <Bell size={20} />
-          <span>Metas</span>
-        </button>
-
-        <button className="flex items-center gap-3 px-4 py-3 rounded-xl text-zinc-500 hover:text-white transition font-bold text-sm">
-          <Settings size={20} />
-          <span>Configurações</span>
-        </button>
-      </nav>
-      
-      {/* Usuário no Rodapé da Sidebar */}
-      <div className="mt-auto p-3 bg-zinc-900/40 rounded-xl flex items-center gap-3 border border-zinc-900">
-         <div className="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-500 flex items-center justify-center font-bold text-xs">
-           {usuario?.nome?.charAt(0) || "U"}
-         </div>
-         <div className="flex flex-col">
-           <span className="text-xs font-bold text-white">{usuario?.nome || "Verinhas"}</span>
-           <span className="text-[10px] text-zinc-500">{usuario?.email || "verinhas@email.com"}</span>
-         </div>
+      {/* Rodapé: Perfil do Usuário */}
+      <div className="pt-4 border-t border-[#161b26] flex items-center gap-3 px-2">
+        <div className="w-9 h-9 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-sm">
+          U
+        </div>
+        <div className="overflow-hidden">
+          <p className="text-sm font-semibold text-white truncate">Usuário Pro</p>
+          <p className="text-xs text-zinc-500 truncate">Mente Milionária</p>
+        </div>
       </div>
     </aside>
   );
