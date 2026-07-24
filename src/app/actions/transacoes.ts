@@ -19,6 +19,7 @@ export async function criarTransacaoAction(formData: FormData): Promise<void> {
 
   await criarTransacaoUseCase.execute(payload);
   revalidatePath('/');
+  revalidatePath('/dashboard');
 }
 
 export const createTransacaoAction = criarTransacaoAction;
