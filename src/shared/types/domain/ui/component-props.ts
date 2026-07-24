@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { CardResumoFinanceiro, TransacaoMockada } from "../financeiro";
+import { CardResumoFinanceiro, Transacao } from "../financeiro";
 
 // Tipagem das Props de containers estruturais gerais
 export interface LayoutProps {
@@ -13,7 +13,7 @@ export interface CardIndicadorProps {
 
 // Tipagem para a tabela que listará os registros
 export interface TabelaTransacoesProps {
-  lista: TransacaoMockada[];
+  lista: Transacao[];
 }
 
 // Tipagem para os itens individuais dentro da Sidebar de navegação

@@ -7,14 +7,18 @@ export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
+  const [erro, setErro] = useState('');
 
   const handleLoginSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (email && senha) {
-      // Aqui, futuramente, entrará a validação de banco de dados
-      // Por enquanto, apenas redirecionamos para o Dashboard (raiz do site)
-      router.push('/');
+
+    if (!email || !senha) {
+      setErro('Informe e-mail e senha para entrar.');
+      return;
     }
+
+    setErro('');
+    router.push('/');
   };
 
   return (
@@ -40,6 +44,7 @@ export default function LoginPage() {
             <input
               id="email"
               type="email"
+              autoComplete="email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -55,6 +60,7 @@ export default function LoginPage() {
             <input
               id="senha"
               type="password"
+              autoComplete="current-password"
               required
               value={senha}
               onChange={(e) => setSenha(e.target.value)}
@@ -62,6 +68,8 @@ export default function LoginPage() {
               className="w-full px-4 py-3 text-sm bg-zinc-950 border border-zinc-800 rounded-xl focus:outline-none focus:border-emerald-500 text-zinc-100 placeholder-zinc-500 transition-colors"
             />
           </div>
+
+          {erro ? <p className="text-xs text-rose-400">{erro}</p> : null}
 
           <button
             type="submit"
