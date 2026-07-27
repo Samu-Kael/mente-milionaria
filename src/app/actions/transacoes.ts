@@ -1,44 +1,62 @@
+'server-only';
 'use server';
 
+import { db } from '@/infrastructure/persistence/db';
+import { transacoes } from '@/infrastructure/persistence/schema';
 import { revalidatePath } from 'next/cache';
-import { transacaoCreateSchema } from '@/modules/transacoes/dto/transacao.dto';
-import { criarTransacaoUseCase } from '@/modules/transacoes/usecases/criar-transacao';
-import { listarTransacoesUseCase } from '@/modules/transacoes/usecases/listar-transacoes';
-import { obterResumoUseCase } from '@/modules/transacoes/usecases/obter-resumo';
-import type { ResumoFinanceiro, Transacao } from '@/shared/types/domain/financeiro';
+import { eq, desc } from 'drizzle-orm';
 
-export async function criarTransacaoAction(formData: FormData): Promise<void> {
-  const payload = transacaoCreateSchema.parse({
-    descricao: formData.get('descricao'),
-    valor: formData.get('valor'),
-    tipo: formData.get('tipo'),
-    categoria: formData.get('categoria'),
-    data: formData.get('data'),
-    usuarioId: formData.get('usuarioId') ?? '1',
+export async function buscarTransacoes(usuarioId = 'usr_1') {
+  try {
+    return await db
+      .select()
+      .from(transacoes)
+      .where(eq(transacoes.usuarioId, usuarioId))
+      .orderBy(desc(transacoes.data));
+  } catch (error) {
+    console.error('Erro ao buscar transações:', error);
+    return [];
+  }
+}
+
+export async function buscarResumo(usuarioId = 'usr_1') {
+  const lista = await buscarTransacoes(usuarioId);
+  
+  const totalEntradas = lista
+    .filter((t) => t.tipo === 'RECEITA')
+    .reduce((acc, t) => acc + t.valor, 0);
+
+  const totalSaidas = lista
+    .filter((t) => t.tipo === 'DESPESA')
+    .reduce((acc, t) => acc + t.valor, 0);
+
+  return {
+    saldoTotal: totalEntradas - totalSaidas,
+    totalEntradas,
+    totalSaidas,
+  };
+}
+
+export async function criarTransacao(formData: FormData) {
+  const descricao = formData.get('descricao') as string;
+  const valor = parseFloat(formData.get('valor') as string);
+  const tipo = formData.get('tipo') as 'RECEITA' | 'DESPESA';
+  const categoria = formData.get('categoria') as string;
+  const data = (formData.get('data') as string) || new Date().toISOString().split('T')[0];
+
+  if (!descricao || isNaN(valor) || !tipo || !categoria) {
+    throw new Error('Preencha todos os campos corretamente.');
+  }
+
+  await db.insert(transacoes).values({
+    id: `trx_${Date.now()}`,
+    usuarioId: 'usr_1', // Usuário padrão para desenvolvimento
+    descricao,
+    valor,
+    tipo,
+    categoria,
+    data,
   });
 
-  await criarTransacaoUseCase.execute(payload);
-  revalidatePath('/');
   revalidatePath('/dashboard');
-}
-
-export const createTransacaoAction = criarTransacaoAction;
-
-export async function listarTransacoesAction(): Promise<Transacao[]> {
-  return listarTransacoesUseCase.execute('1');
-}
-
-export async function obterResumoAction(): Promise<ResumoFinanceiro> {
-  const transacoes = await listarTransacoesAction();
-  return obterResumoUseCase.execute(transacoes);
-}
-
-export async function obterDashboardDataAction(): Promise<{
-  transacoes: Transacao[];
-  resumo: ResumoFinanceiro;
-}> {
-  const transacoes = await listarTransacoesAction();
-  const resumo = obterResumoUseCase.execute(transacoes);
-
-  return { transacoes, resumo };
 }

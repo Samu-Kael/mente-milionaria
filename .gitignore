@@ -1,2 +1,25 @@
-node_modules/
-.next/
+# Dependencies
+/node_modules
+/.pnpm-store
+
+# Next.js build output
+/.next/
+/out/
+
+# SQLite & Drizzle local databases
+*.db
+*.db-journal
+*.sqlite
+/local.db
+/database.sqlite
+/drizzle/
+
+# Environment files
+.env
+.env*.local
+
+# IDEs
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+.DS_Store

@@ -1,125 +1,115 @@
 'use client';
 
 import { useState } from 'react';
-import { createTransacaoAction } from '@/app/actions/transacoes';
-
-const tipos = ['RECEITA', 'DESPESA'] as const;
+import { criarTransacao } from '@/app/actions/transacoes';
+import { Plus, X } from 'lucide-react';
 
 export function ModalNovaTransacao() {
   const [aberto, setAberto] = useState(false);
+  const [carregando, setCarregando] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setCarregando(true);
+    const formData = new FormData(e.currentTarget);
+    try {
+      await criarTransacao(formData);
+      setAberto(false);
+    } catch (err) {
+      alert('Erro ao salvar transação');
+    } finally {
+      setCarregando(false);
+    }
+  }
 
   return (
     <>
       <button
-        type="button"
         onClick={() => setAberto(true)}
-        className="inline-flex items-center rounded-xl bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-zinc-950 transition hover:bg-emerald-400"
+        className="flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold text-xs rounded-xl transition-all shadow-lg shadow-emerald-500/20 active:scale-95"
       >
-        Nova transação
+        <Plus className="w-4 h-4" /> Nova Transação
       </button>
 
-      {aberto ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/80 p-4">
-          <div className="w-full max-w-lg rounded-2xl border border-zinc-800 bg-zinc-900 p-6 shadow-2xl">
-            <div className="mb-5 flex items-center justify-between gap-3">
-              <div>
-                <h2 className="text-xl font-bold text-zinc-100">Nova transação</h2>
-                <p className="text-xs text-zinc-400">Cadastre um fluxo de entrada ou saída.</p>
-              </div>
+      {aberto && (
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-3xl w-full max-w-md p-6 space-y-6 shadow-2xl relative">
+            <div className="flex items-center justify-between border-b border-zinc-800 pb-4">
+              <h3 className="text-lg font-bold text-zinc-100">Nova Transação</h3>
               <button
-                type="button"
                 onClick={() => setAberto(false)}
-                className="rounded-lg border border-zinc-700 px-3 py-1.5 text-xs text-zinc-300"
+                className="text-zinc-400 hover:text-zinc-100 p-1 rounded-lg"
               >
-                Fechar
+                <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form action={createTransacaoAction} className="space-y-4">
-              <input type="hidden" name="usuarioId" value="1" />
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="text-xs font-semibold text-zinc-300">Descrição</label>
+                <input
+                  name="descricao"
+                  required
+                  placeholder="Ex: Salário, Mercado..."
+                  className="w-full mt-1 px-4 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-sm focus:outline-none focus:border-emerald-500 text-zinc-100"
+                />
+              </div>
 
-              <div className="grid gap-4 md:grid-cols-2">
-                <label className="space-y-2 text-sm text-zinc-300">
-                  <span>Descrição</span>
-                  <input
-                    name="descricao"
-                    required
-                    className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100 outline-none focus:border-emerald-500"
-                    placeholder="Ex.: Salário, Mercado..."
-                  />
-                </label>
-
-                <label className="space-y-2 text-sm text-zinc-300">
-                  <span>Categoria</span>
-                  <input
-                    name="categoria"
-                    required
-                    className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100 outline-none focus:border-emerald-500"
-                    placeholder="Ex.: Renda"
-                  />
-                </label>
-
-                <label className="space-y-2 text-sm text-zinc-300">
-                  <span>Valor</span>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-semibold text-zinc-300">Valor (R$)</label>
                   <input
                     name="valor"
                     type="number"
-                    min="0.01"
                     step="0.01"
                     required
-                    className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100 outline-none focus:border-emerald-500"
-                    placeholder="150.00"
+                    placeholder="0.00"
+                    className="w-full mt-1 px-4 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-sm focus:outline-none focus:border-emerald-500 text-zinc-100"
                   />
-                </label>
-
-                <label className="space-y-2 text-sm text-zinc-300">
-                  <span>Tipo</span>
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-zinc-300">Tipo</label>
                   <select
                     name="tipo"
-                    defaultValue="DESPESA"
-                    className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100 outline-none focus:border-emerald-500"
+                    className="w-full mt-1 px-4 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-sm focus:outline-none focus:border-emerald-500 text-zinc-100"
                   >
-                    {tipos.map((tipo) => (
-                      <option key={tipo} value={tipo}>
-                        {tipo}
-                      </option>
-                    ))}
+                    <option value="RECEITA">Entrada (+)</option>
+                    <option value="DESPESA">Saída (-)</option>
                   </select>
-                </label>
+                </div>
               </div>
 
-              <label className="block space-y-2 text-sm text-zinc-300">
-                <span>Data</span>
+              <div>
+                <label className="text-xs font-semibold text-zinc-300">Categoria</label>
+                <input
+                  name="categoria"
+                  required
+                  placeholder="Ex: Alimentação, Renda, Moradia..."
+                  className="w-full mt-1 px-4 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-sm focus:outline-none focus:border-emerald-500 text-zinc-100"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-zinc-300">Data</label>
                 <input
                   name="data"
                   type="date"
-                  required
-                  className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100 outline-none focus:border-emerald-500"
+                  defaultValue={new Date().toISOString().split('T')[0]}
+                  className="w-full mt-1 px-4 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-sm focus:outline-none focus:border-emerald-500 text-zinc-100"
                 />
-              </label>
-
-              <div className="flex justify-end gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setAberto(false)}
-                  className="rounded-xl border border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-300"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  onClick={() => setAberto(false)}
-                  className="rounded-xl bg-emerald-500 px-4 py-2 text-sm font-bold text-zinc-950"
-                >
-                  Salvar transação
-                </button>
               </div>
+
+              <button
+                type="submit"
+                disabled={carregando}
+                className="w-full py-3 bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold rounded-xl text-sm transition-all shadow-lg shadow-emerald-500/20 disabled:opacity-50"
+              >
+                {carregando ? 'Salvando...' : 'Adicionar Movimentação'}
+              </button>
             </form>
           </div>
         </div>
-      ) : null}
+      )}
     </>
   );
 }
-
-export default ModalNovaTransacao;
