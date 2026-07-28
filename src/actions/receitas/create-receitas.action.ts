@@ -1,21 +1,27 @@
-'use server'
+export async function createReceitaAction(formData: FormData) {
+  try {
+    const data = {
+      descricao: formData.get('descricao') as string,
+      valor: Number(formData.get('valor')),
+      categoria: formData.get('categoria') as string,
+      data: formData.get('data') as string,
+    };
 
-import { db } from "@/infrastructure/database/client";
-import { receitas } from "@/infrastructure/database/schemas/schemas";
-import { revalidatePath } from "next/cache";
+    const response = await fetch('/api/receitas', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
 
-export async function acaoCriarReceita(formData: FormData) {
-  const descricao = formData.get("descricao") as string;
-  const valor = Math.round(parseFloat(formData.get("valor") as string) * 100);
-  const data = formData.get("data") as string;
-  const categoriaId = parseInt(formData.get("categoriaId") as string, 10);
+    const result = await response.json();
 
-  await db.insert(receitas).values({ 
-    descricao, 
-    valor, 
-    data, 
-    categoriaId 
-  });
-  
-  revalidatePath("/");
+    if (!response.ok) {
+      return { success: false, error: result.error || 'Erro ao criar receita' };
+    }
+
+    return { success: true, data: result };
+  } catch (error) {
+    console.error('Erro na action createReceitaAction:', error);
+    return { success: false, error: 'Erro de conexão ao criar receita' };
+  }
 }

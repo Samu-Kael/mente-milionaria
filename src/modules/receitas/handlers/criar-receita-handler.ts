@@ -1,4 +1,4 @@
-import { repositorioReceitaDrizzle } from "@/infrastructure/persistence/repositories/repositorio-receita-drizzle";
+import { repositorioReceitaDrizzle } from "@/modules/receitas/repositories/repositorio-receita-drizzle";
 import { validarCriarReceita } from "../dto/criar-receita.dto";
 import { CriarReceitaUseCase } from "../usecases/criar-receitas.usecases";
 

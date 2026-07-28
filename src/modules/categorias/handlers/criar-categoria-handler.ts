@@ -1,4 +1,4 @@
-import { repositorioCategoriaDrizzle } from "@/infrastructure/persistence/repositories/repositorio-categoria-drizzle";
+import { repositorioCategoriaDrizzle } from "@/modules/categorias/repositories/repositorio-categoria-drizzle";
 import { validarCriarCategoria } from "../dto/criar-categoria.dto";
 import { CriarCategoriaUseCase } from "../usecases/criar-categoria.usecases";
 

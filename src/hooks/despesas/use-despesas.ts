@@ -1,30 +1,23 @@
-import { useState, useTransition } from "react";
-import { acaoCriarDespesa } from "@/actions/despesas/create-despesas.action";
+'use client';
+
+import { useState } from 'react';
+import { createDespesaAction } from '@/actions/despesas/create-despesas.action';
 
 export function useDespesas() {
-  const [isPending, startTransition] = useTransition();
-  const [erro, setErro] = useState<string | null>(null);
-  const [sucesso, setSucesso] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  async function cadastrarDespesa(formData: FormData) {
-    setErro(null);
-    setSucesso(false);
+  const handleCreateDespesa = async (formData: FormData) => {
+    setIsSubmitting(true);
+    setErrorMsg(null);
+    const result = await createDespesaAction(formData);
+    setIsSubmitting(false);
 
-    startTransition(async () => {
-      try {
-        await acaoCriarDespesa(formData);
-        setSucesso(true);
-      } catch (err) {
-        setErro("Não foi possível registrar a despesa. Verifique os dados.");
-        console.error(err);
-      }
-    });
-  }
-
-  return {
-    cadastrarDespesa,
-    isPending,
-    erro,
-    sucesso,
+    if (!result.success && result.error) {
+      setErrorMsg(result.error);
+    }
+    return result.success;
   };
+
+  return { isSubmitting, errorMsg, handleCreateDespesa };
 }

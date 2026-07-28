@@ -1,15 +1,18 @@
-'use server'
+export async function deleteDespesaAction(id: string) {
+  try {
+    const response = await fetch(`/api/despesas?id=${id}`, {
+      method: 'DELETE',
+    });
 
-import { db } from "@/infrastructure/database/client";
-import { despesas } from "@/infrastructure/database/schemas/schemas";
-import { revalidatePath } from "next/cache";
+    const result = await response.json();
 
-export async function acaoCriarDespesa(formData: FormData) {
-  const descricao = formData.get("descricao") as string;
-  const valor = Math.round(parseFloat(formData.get("valor") as string) * 100);
-  const data = formData.get("data") as string;
-  const categoriaId = parseInt(formData.get("categoriaId") as string);
+    if (!response.ok) {
+      return { success: false, error: result.error || 'Erro ao deletar despesa' };
+    }
 
-  await db.insert(despesas).values({ descricao, valor, data, categoriaId });
-  revalidatePath("/");
+    return { success: true };
+  } catch (error) {
+    console.error('Erro na action deleteDespesaAction:', error);
+    return { success: false, error: 'Erro de conexão ao deletar despesa' };
+  }
 }

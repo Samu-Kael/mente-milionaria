@@ -1,14 +1,26 @@
-'use server'
+export async function createMetaAction(formData: FormData) {
+  try {
+    const data = {
+      titulo: formData.get('titulo') as string,
+      valorAlvo: Number(formData.get('valorAlvo')),
+      prazo: formData.get('prazo') as string,
+    };
 
-import { db } from "@/infrastructure/database/client";
-import { metas } from "@/infrastructure/database/schemas/schemas";
-import { revalidatePath } from "next/cache";
+    const response = await fetch('/api/metas', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
 
-export async function acaoCriarMeta(formData: FormData) {
-  const objetivo = formData.get("objetivo") as string;
-  const valorAlvo = Math.round(parseFloat(formData.get("valorAlvo") as string) * 100);
-  const prazo = new Date(formData.get("prazo") as string);
+    const result = await response.json();
 
-  await db.insert(metas).values({ objetivo, valorAlvo, prazo });
-  revalidatePath("/");
+    if (!response.ok) {
+      return { success: false, error: result.error || 'Erro ao criar meta' };
+    }
+
+    return { success: true, data: result };
+  } catch (error) {
+    console.error('Erro na action createMetaAction:', error);
+    return { success: false, error: 'Erro de conexão ao criar meta' };
+  }
 }

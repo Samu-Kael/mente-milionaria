@@ -1,13 +1,25 @@
-'use server'
+export async function createCategoriaAction(formData: FormData) {
+  try {
+    const data = {
+      nome: formData.get('nome') as string,
+      cor: formData.get('cor') as string,
+    };
 
-import { db } from "@/infrastructure/database/client";
-import { categorias } from "@/infrastructure/database/schemas/schemas";
-import { revalidatePath } from "next/cache";
+    const response = await fetch('/api/categorias', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
 
-export async function acaoCriarCategoria(formData: FormData) {
-  const nome = formData.get("nome") as string;
-  const tipo = formData.get("tipo") as "receita" | "despesa";
+    const result = await response.json();
 
-  await db.insert(categorias).values({ nome, tipo });
-  revalidatePath("/");
+    if (!response.ok) {
+      return { success: false, error: result.error || 'Erro ao criar categoria' };
+    }
+
+    return { success: true, data: result };
+  } catch (error) {
+    console.error('Erro na action createCategoriaAction:', error);
+    return { success: false, error: 'Erro de conexão ao criar categoria' };
+  }
 }

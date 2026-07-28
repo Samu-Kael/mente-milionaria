@@ -1,21 +1,27 @@
-'use server'
+export async function createDespesaAction(formData: FormData) {
+  try {
+    const data = {
+      descricao: formData.get('descricao') as string,
+      valor: Number(formData.get('valor')),
+      categoria: formData.get('categoria') as string,
+      data: formData.get('data') as string,
+    };
 
-import { db } from "@/infrastructure/database/client";
-import { despesas } from "@/infrastructure/database/schemas/schemas";
-import { revalidatePath } from "next/cache";
+    const response = await fetch('/api/despesas', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
 
-export async function acaoCriarDespesa(formData: FormData) {
-  const descricao = formData.get("descricao") as string;
-  const valor = Math.round(parseFloat(formData.get("valor") as string) * 100);
-  const data = formData.get("data") as string;
-  const categoriaId = parseInt(formData.get("categoriaId") as string, 10);
+    const result = await response.json();
 
-  await db.insert(despesas).values({ 
-    descricao, 
-    valor, 
-    data, 
-    categoriaId 
-  });
-  
-  revalidatePath("/");
+    if (!response.ok) {
+      return { success: false, error: result.error || 'Erro ao criar despesa' };
+    }
+
+    return { success: true, data: result };
+  } catch (error) {
+    console.error('Erro na action createDespesaAction:', error);
+    return { success: false, error: 'Erro de conexão ao criar despesa' };
+  }
 }

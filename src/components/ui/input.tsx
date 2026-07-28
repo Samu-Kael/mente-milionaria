@@ -1,20 +1,33 @@
-import React from "react";
+import { InputHTMLAttributes, forwardRef, useId } from 'react';
 
-interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  label: string;
+interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+  label?: string;
+  error?: string;
 }
 
-export function Input({ label, ...props }: InputProps) {
-  return (
-    <div className="w-full">
-      <label className="block text-xs font-semibold text-gray-400 uppercase mb-1 tracking-wider">
-        {label}
-      </label>
-      <input
-        {...props}
-        required
-        className="w-full bg-gray-950 border border-gray-800 rounded-lg p-2.5 text-white placeholder-gray-600 focus:outline-none focus:border-gray-600 transition-colors text-sm"
-      />
-    </div>
-  );
-}
+export const Input = forwardRef<HTMLInputElement, InputProps>(
+  ({ label, error, className = '', id, ...props }, ref) => {
+    const defaultId = useId();
+    const inputId = id ?? defaultId;
+
+    return (
+      <div className="w-full space-y-1">
+        {label && (
+          <label htmlFor={inputId} className="block text-sm font-medium text-zinc-300">
+            {label}
+          </label>
+        )}
+        <input
+          id={inputId}
+          ref={ref}
+          className={`w-full bg-zinc-900 border border-zinc-700 rounded-lg p-2.5 text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500 transition ${
+            error ? 'border-red-500 focus:border-red-500' : ''
+          } ${className}`}
+          {...props}
+        />
+        {error && <span className="text-xs text-red-400 block mt-1">{error}</span>}
+      </div>
+    );
+  }
+);
+Input.displayName = 'Input';

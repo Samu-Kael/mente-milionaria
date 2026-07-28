@@ -1,111 +1,90 @@
 'use client';
 
-import { useState } from 'react';
-import { criarTransacao } from '@/app/actions/transacoes';
-import { Plus, X } from 'lucide-react';
+import { useTransacoes } from '@/hooks/transacoes/use-transacoes';
+import { Button } from '@/shared/components/ui/button';
+import { Input } from '@/shared/components/ui/input';
+import { Select } from '@/shared/components/ui/select';
 
 export function ModalNovaTransacao() {
-  const [aberto, setAberto] = useState(false);
-  const [carregando, setCarregando] = useState(false);
-
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setCarregando(true);
-    const formData = new FormData(e.currentTarget);
-    try {
-      await criarTransacao(formData);
-      setAberto(false);
-    } catch (err) {
-      alert('Erro ao salvar transação');
-    } finally {
-      setCarregando(false);
-    }
-  }
+  const { isModalOpen, isSubmitting, errorMsg, openModal, closeModal, handleCreateTransacao } = useTransacoes();
 
   return (
     <>
-      <button
-        onClick={() => setAberto(true)}
-        className="flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold text-xs rounded-xl transition-all shadow-lg shadow-emerald-500/20 active:scale-95"
-      >
-        <Plus className="w-4 h-4" /> Nova Transação
-      </button>
+      <Button onClick={openModal} variant="primary">
+        + Nova Transação
+      </Button>
 
-      {aberto && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-zinc-900 border border-zinc-800 rounded-3xl w-full max-w-md p-6 space-y-6 shadow-2xl relative">
-            <div className="flex items-center justify-between border-b border-zinc-800 pb-4">
-              <h3 className="text-lg font-bold text-zinc-100">Nova Transação</h3>
-              <button
-                onClick={() => setAberto(false)}
-                className="text-zinc-400 hover:text-zinc-100 p-1 rounded-lg"
-              >
-                <X className="w-5 h-5" />
-              </button>
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
+          <div className="bg-zinc-950 border border-zinc-800 rounded-xl p-6 w-full max-w-md shadow-2xl text-zinc-100">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-bold">Nova Transação</h2>
+              <Button onClick={closeModal} variant="ghost" className="!p-1">✕</Button>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="text-xs font-semibold text-zinc-300">Descrição</label>
-                <input
-                  name="descricao"
+            {errorMsg && (
+              <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 text-red-400 text-sm rounded-lg">
+                {errorMsg}
+              </div>
+            )}
+
+            <form action={handleCreateTransacao} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <Select
+                  label="Tipo"
+                  name="tipo"
                   required
-                  placeholder="Ex: Salário, Mercado..."
-                  className="w-full mt-1 px-4 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-sm focus:outline-none focus:border-emerald-500 text-zinc-100"
+                  options={[
+                    { value: 'DESPESA', label: 'Despesa (-)' },
+                    { value: 'RECEITA', label: 'Receita (+)' },
+                  ]}
+                />
+                <Input
+                  label="Data"
+                  type="date"
+                  name="data"
+                  required
                 />
               </div>
+
+              <Input
+                label="Descrição"
+                type="text"
+                name="descricao"
+                placeholder="Ex: Supermercado"
+                required
+              />
 
               <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-xs font-semibold text-zinc-300">Valor (R$)</label>
-                  <input
-                    name="valor"
-                    type="number"
-                    step="0.01"
-                    required
-                    placeholder="0.00"
-                    className="w-full mt-1 px-4 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-sm focus:outline-none focus:border-emerald-500 text-zinc-100"
-                  />
-                </div>
-                <div>
-                  <label className="text-xs font-semibold text-zinc-300">Tipo</label>
-                  <select
-                    name="tipo"
-                    className="w-full mt-1 px-4 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-sm focus:outline-none focus:border-emerald-500 text-zinc-100"
-                  >
-                    <option value="RECEITA">Entrada (+)</option>
-                    <option value="DESPESA">Saída (-)</option>
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="text-xs font-semibold text-zinc-300">Categoria</label>
-                <input
+                <Input
+                  label="Valor (R$)"
+                  type="number"
+                  step="0.01"
+                  name="valor"
+                  placeholder="0.00"
+                  required
+                />
+                <Select
+                  label="Categoria"
                   name="categoria"
                   required
-                  placeholder="Ex: Alimentação, Renda, Moradia..."
-                  className="w-full mt-1 px-4 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-sm focus:outline-none focus:border-emerald-500 text-zinc-100"
+                  options={[
+                    { value: 'Alimentação', label: 'Alimentação' },
+                    { value: 'Moradia', label: 'Moradia' },
+                    { value: 'Transporte', label: 'Transporte' },
+                    { value: 'Outros', label: 'Outros' },
+                  ]}
                 />
               </div>
 
-              <div>
-                <label className="text-xs font-semibold text-zinc-300">Data</label>
-                <input
-                  name="data"
-                  type="date"
-                  defaultValue={new Date().toISOString().split('T')[0]}
-                  className="w-full mt-1 px-4 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-sm focus:outline-none focus:border-emerald-500 text-zinc-100"
-                />
+              <div className="flex justify-end gap-3 pt-6 mt-2 border-t border-zinc-800/50">
+                <Button type="button" onClick={closeModal} variant="secondary">
+                  Cancelar
+                </Button>
+                <Button type="submit" variant="primary" isLoading={isSubmitting}>
+                  Salvar
+                </Button>
               </div>
-
-              <button
-                type="submit"
-                disabled={carregando}
-                className="w-full py-3 bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold rounded-xl text-sm transition-all shadow-lg shadow-emerald-500/20 disabled:opacity-50"
-              >
-                {carregando ? 'Salvando...' : 'Adicionar Movimentação'}
-              </button>
             </form>
           </div>
         </div>

@@ -1,43 +1,20 @@
-import type { ResumoFinanceiro } from '@/shared/types/domain/financeiro';
+import { Card } from '@/components/ui/card'; // Ajuste conforme seus componentes de UI
 import { formatarMoeda } from '@/shared/utils/formatters';
 
+// 1. Definimos o que o componente precisa receber (Props)
 interface ResumoCardsProps {
-  resumo?: ResumoFinanceiro;
+  saldoTotal: number;
+  receitasMes: number;
+  despesasMes: number;
 }
 
-export function ResumoCards({ resumo }: ResumoCardsProps) {
-  const saldoTotal = resumo?.saldoTotal ?? 0;
-  const totalEntradas = resumo?.totalEntradas ?? 0;
-  const totalSaidas = resumo?.totalSaidas ?? 0;
-
+// 2. O componente apenas exibe os dados, sem regras de negócio!
+export function ResumoCards({ saldoTotal, receitasMes, despesasMes }: ResumoCardsProps) {
   return (
-    <section className="grid grid-cols-1 md:grid-cols-3 gap-5">
-      <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-2xl shadow-sm space-y-2">
-        <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Saldo na Conta</span>
-        <div
-          className={`text-3xl font-bold tracking-tight ${
-            saldoTotal >= 0 ? 'text-zinc-100' : 'text-rose-400'
-          }`}
-        >
-          {formatarMoeda(saldoTotal)}
-        </div>
-      </div>
-
-      <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-2xl shadow-sm space-y-2">
-        <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Entradas</span>
-        <div className="text-3xl font-bold tracking-tight text-emerald-400">
-          {formatarMoeda(totalEntradas)}
-        </div>
-      </div>
-
-      <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-2xl shadow-sm space-y-2">
-        <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Saídas</span>
-        <div className="text-3xl font-bold tracking-tight text-rose-400">
-          {formatarMoeda(totalSaidas)}
-        </div>
-      </div>
-    </section>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <Card title="Saldo Atual" value={formatarMoeda(saldoTotal)} />
+      <Card title="Receitas (Mês)" value={formatarMoeda(receitasMes)} className="text-emerald-500" />
+      <Card title="Despesas (Mês)" value={formatarMoeda(despesasMes)} className="text-red-500" />
+    </div>
   );
 }
-
-export default ResumoCards;

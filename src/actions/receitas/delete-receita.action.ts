@@ -1,11 +1,18 @@
-'use server'
+export async function deleteReceitaAction(id: string) {
+  try {
+    const response = await fetch(`/api/receitas?id=${id}`, {
+      method: 'DELETE',
+    });
 
-import { db } from "@/infrastructure/database/client";
-import { receitas } from "@/infrastructure/database/schemas/schemas";
-import { eq } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
+    const result = await response.json();
 
-export async function acaoDeletarReceita(id: number) {
-  await db.delete(receitas).where(eq(receitas.id, id));
-  revalidatePath("/");
+    if (!response.ok) {
+      return { success: false, error: result.error || 'Erro ao deletar receita' };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error('Erro na action deleteReceitaAction:', error);
+    return { success: false, error: 'Erro de conexão ao deletar receita' };
+  }
 }
