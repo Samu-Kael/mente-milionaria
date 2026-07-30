@@ -1,19 +1,19 @@
-import { DespesasRepository } from '../repositories/despesas.repository';
+import { ReceitasRepository } from '../repositories/receitas.repository';
 
-export const DespesasUseCase = {
+export const ReceitasUseCase = {
   async buscarTodas() {
-    return await DespesasRepository.buscarTodas();
+    return await ReceitasRepository.buscarTodas();
   },
 
   async criar(dados: any) {
     if (!dados.descricao || !dados.valor) {
       throw new Error('Descrição e valor são obrigatórios.');
     }
-    return await DespesasRepository.criar(dados);
+    return await ReceitasRepository.criar(dados);
   },
 
   async deletar(id: string) {
     if (!id) throw new Error('ID é obrigatório para exclusão.');
-    return await DespesasRepository.deletar(id);
+    return await ReceitasRepository.deletar(id);
   }
 };

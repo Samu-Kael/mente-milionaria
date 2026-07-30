@@ -1,130 +1,61 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
+import { useDespesas } from '@/hooks/despesas/use-despesas';
+import { useCategorias } from '@/hooks/categorias/use-categorias';
+import { SelectCategoriaDinamico } from '../categorias/select-categoria-dinamico';
 
-interface FormDespesaProps {
-  categorias?: Array<{ id: string; nome: string; tipo?: string }>;
-}
+export function FormDespesa() {
+  const { handleCreateDespesa, isSubmitting, errorMsg } = useDespesas();
+  const { salvarCategoriaSeNecessario } = useCategorias();
 
-export function FormDespesa({ categorias = [] }: FormDespesaProps) {
-  const [descricao, setDescricao] = useState("");
-  const [categoria, setCategoria] = useState("");
-  const [valor, setValor] = useState("");
-  const [data, setData] = useState("");
-
-  // Garante que o filter não quebre caso passe algo indefinido
-  const categoriasDespesa = (categorias || []).filter(
-    (cat) => !cat.tipo || cat.tipo === "DESPESA"
-  );
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    alert(`Despesa "${descricao}" no valor de R$ ${valor} salva com sucesso!`);
+    
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+
+    const nomeCategoriaFinal = await salvarCategoriaSeNecessario();
+
+    const novaDespesa = {
+      descricao: formData.get('descricao') as string,
+      valor: Number(formData.get('valor')),
+      data: formData.get('data') as string,
+      categoria: nomeCategoriaFinal || (formData.get('categoria') as string),
+    };
+
+    await handleCreateDespesa(novaDespesa, form);
   };
 
   return (
-    <div className="w-full bg-slate-900/60 border border-slate-800 p-8 rounded-2xl shadow-xl space-y-6">
-      <div className="border-b border-slate-800 pb-4">
-        <h1 className="text-2xl font-bold text-rose-500">Cadastrar Nova Despesa</h1>
-        <p className="text-xs text-slate-400 mt-1">
-          Preencha os dados abaixo para registrar seus gastos
-        </p>
+    <form onSubmit={onSubmit} className="space-y-4 bg-zinc-900 p-6 rounded-lg border border-zinc-800">
+      <h2 className="text-xl font-bold text-white mb-4">Nova Despesa</h2>
+
+      {errorMsg && (
+        <div className="bg-red-500/10 border border-red-500/50 text-red-500 p-3 rounded text-sm">
+          {errorMsg}
+        </div>
+      )}
+
+      <div className="space-y-1">
+        <label htmlFor="descricao" className="text-sm font-medium">Descrição</label>
+        <input type="text" name="descricao" id="descricao" required className="w-full p-2 rounded-md border border-zinc-700 bg-zinc-800 text-white" placeholder="Ex: Conta de Luz" />
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Descrição */}
-          <div>
-            <label className="text-xs font-semibold uppercase text-slate-400 block mb-2">
-              Descrição
-            </label>
-            <input
-              type="text"
-              value={descricao}
-              onChange={(e) => setDescricao(e.target.value)}
-              placeholder="Ex: Mercado, Aluguel, Passagem..."
-              required
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-rose-500 transition"
-            />
-          </div>
+      <div className="space-y-1">
+        <label htmlFor="valor" className="text-sm font-medium">Valor (R$)</label>
+        <input type="number" step="0.01" name="valor" id="valor" required className="w-full p-2 rounded-md border border-zinc-700 bg-zinc-800 text-white" placeholder="0.00" />
+      </div>
 
-          {/* Categoria sem Emojis */}
-          <div>
-            <label className="text-xs font-semibold uppercase text-slate-400 block mb-2">
-              Categoria
-            </label>
-            <select
-              value={categoria}
-              onChange={(e) => setCategoria(e.target.value)}
-              required
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-rose-500 transition"
-            >
-              <option value="" disabled>
-                Selecione uma categoria
-              </option>
-              {categoriasDespesa.length > 0 ? (
-                categoriasDespesa.map((cat) => (
-                  <option key={cat.id} value={cat.id}>
-                    {cat.nome}
-                  </option>
-                ))
-              ) : (
-                <>
-                  <option value="comida">Comida / Alimentação</option>
-                  <option value="viagem">Viagem</option>
-                  <option value="moradia">Moradia</option>
-                  <option value="transporte">Transporte</option>
-                  <option value="lazer">Lazer</option>
-                  <option value="saude">Saúde</option>
-                  <option value="educacao">Educação</option>
-                  <option value="outros">Outros</option>
-                </>
-              )}
-            </select>
-          </div>
-        </div>
+      <div className="space-y-1">
+        <label htmlFor="data" className="text-sm font-medium">Data</label>
+        <input type="date" name="data" id="data" required className="w-full p-2 rounded-md border border-zinc-700 bg-zinc-800 text-white" />
+      </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Valor */}
-          <div>
-            <label className="text-xs font-semibold uppercase text-slate-400 block mb-2">
-              Valor Gasto (R$)
-            </label>
-            <input
-              type="number"
-              step="0.01"
-              value={valor}
-              onChange={(e) => setValor(e.target.value)}
-              placeholder="0,00"
-              required
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-rose-500 transition"
-            />
-          </div>
+      <SelectCategoriaDinamico />
 
-          {/* Data */}
-          <div>
-            <label className="text-xs font-semibold uppercase text-slate-400 block mb-2">
-              Data
-            </label>
-            <input
-              type="date"
-              value={data}
-              onChange={(e) => setData(e.target.value)}
-              required
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-rose-500 transition"
-            />
-          </div>
-        </div>
-
-        <div className="flex justify-end pt-4">
-          <button
-            type="submit"
-            className="w-full md:w-auto bg-rose-500 hover:bg-rose-600 text-white font-semibold px-8 py-3.5 rounded-xl transition shadow-lg shadow-rose-500/20 active:scale-[0.99]"
-          >
-            Registrar Despesa
-          </button>
-        </div>
-      </form>
-    </div>
+      <button type="submit" disabled={isSubmitting} className="w-full py-2 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-md transition-colors disabled:opacity-50">
+        {isSubmitting ? 'Salvando...' : 'Salvar Despesa'}
+      </button>
+    </form>
   );
 }

@@ -1,64 +1,53 @@
-import type { Transacao } from '@/shared/types/domain/financeiro';
-import { formatarMoeda } from '@/shared/utils/formatters';
+'use client';
 
-interface TransacoesRecentesProps {
-  transacoes?: Transacao[];
+export interface TransacaoItem {
+  id: string;
+  descricao: string;
+  valor: number;
+  data: string;
+  categoria: string;
+  tipo: 'receita' | 'despesa';
 }
 
-export function TransacoesRecentes({ transacoes = [] }: TransacoesRecentesProps) {
-  const formatarData = (dataStr: string) => {
-    if (!dataStr) return '';
-    const partes = dataStr.split('-');
-    return partes.length === 3 ? `${partes[2]}/${partes[1]}/${partes[0]}` : dataStr;
-  };
+interface TransacoesRecentesProps {
+  transacoes: TransacaoItem[];
+}
+
+export function TransacoesRecentes({ transacoes }: TransacoesRecentesProps) {
+  if (!transacoes || transacoes.length === 0) {
+    return (
+      <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-xl text-center">
+        <p className="text-zinc-500 text-sm">Nenhuma transação registrada até o momento.</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 shadow-sm space-y-4">
-      <div>
-        <h2 className="text-lg font-bold text-zinc-100">Transações Recentes</h2>
-        <p className="text-xs text-zinc-400">Últimas movimentações financeiras</p>
-      </div>
+    <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-xl space-y-4">
+      <h3 className="text-lg font-bold text-white">Transações Recentes</h3>
 
-      {transacoes.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-zinc-700 bg-zinc-950/60 p-6 text-sm text-zinc-400">
-          Nenhuma transação cadastrada ainda.
-        </div>
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm border-collapse">
-            <thead>
-              <tr className="border-b border-zinc-800 text-zinc-400 text-xs uppercase tracking-wider">
-                <th className="pb-3 font-medium">Descrição</th>
-                <th className="pb-3 font-medium">Categoria</th>
-                <th className="pb-3 font-medium">Data</th>
-                <th className="pb-3 font-medium text-right">Valor</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-zinc-800/60">
-              {transacoes.map((item) => (
-                <tr key={item.id} className="hover:bg-zinc-800/40 transition-colors">
-                  <td className="py-4 text-zinc-200 font-medium">{item.descricao}</td>
-                  <td className="py-4">
-                    <span className="inline-block px-2.5 py-1 text-xs font-medium rounded-full bg-zinc-800 text-zinc-300 border border-zinc-700/60">
-                      {item.categoria}
-                    </span>
-                  </td>
-                  <td className="py-4 text-zinc-400 text-xs">{formatarData(item.data)}</td>
-                  <td
-                    className={`py-4 text-right font-semibold ${
-                      item.tipo === 'RECEITA' ? 'text-emerald-400' : 'text-rose-400'
-                    }`}
-                  >
-                    {item.tipo === 'RECEITA' ? '+' : '-'} {formatarMoeda(item.valor)}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      <div className="space-y-3">
+        {transacoes.slice(0, 5).map((item) => (
+          <div 
+            key={item.id} 
+            className="flex justify-between items-center p-3 bg-zinc-800/40 hover:bg-zinc-800/70 rounded-lg transition-colors"
+          >
+            <div className="space-y-1">
+              <p className="font-semibold text-zinc-200 text-sm">{item.descricao}</p>
+              <div className="flex gap-2 text-xs text-zinc-400">
+                <span className="bg-zinc-700/50 px-2 py-0.5 rounded text-zinc-300">
+                  {item.categoria}
+                </span>
+                <span>{new Date(item.data).toLocaleDateString('pt-BR')}</span>
+              </div>
+            </div>
+
+            <span className={`font-bold text-sm ${item.tipo === 'receita' ? 'text-emerald-400' : 'text-red-400'}`}>
+              {item.tipo === 'receita' ? '+' : '-'} R$ {item.valor.toFixed(2)}
+            </span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
-
-export default TransacoesRecentes;

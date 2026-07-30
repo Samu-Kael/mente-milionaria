@@ -4,9 +4,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 const menuItems = [
-  { name: 'Dashboard', path: '/dashboard', icon: '📊' },
+  { name: 'Dashboard', path: '/', icon: '📊' },
   { name: 'Metas', path: '/metas', icon: '🎯' },
-  { name: 'Configurações', path: '/configuracoes', icon: '⚙️' },
 ];
 
 export function Sidebar() {

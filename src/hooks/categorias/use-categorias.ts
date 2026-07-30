@@ -1,23 +1,60 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { getCategoriasUnificadasAction } from '@/actions/categorias/get-categorias.action';
 import { createCategoriaAction } from '@/actions/categorias/create-categoria.action';
 
 export function useCategorias() {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [categorias, setCategorias] = useState<any[]>([]);
+  const [categoriaSelecionada, setCategoriaSelecionada] = useState<string>('');
+  const [nomeOutraCategoria, setNomeOutraCategoria] = useState<string>('');
+  const [isOutraSelected, setIsOutraSelected] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const handleCreateCategoria = async (formData: FormData) => {
-    setIsSubmitting(true);
-    setErrorMsg(null);
-    const result = await createCategoriaAction(formData);
-    setIsSubmitting(false);
-
-    if (!result.success && result.error) {
-      setErrorMsg(result.error);
-    }
-    return result.success;
+  const fetchCategorias = async () => {
+    setIsLoading(true);
+    const data = await getCategoriasUnificadasAction();
+    setCategorias(data);
+    setIsLoading(false);
   };
 
-  return { isSubmitting, errorMsg, handleCreateCategoria };
+  useEffect(() => {
+    fetchCategorias();
+  }, []);
+
+  const handleSelectCategoria = (valor: string) => {
+    setCategoriaSelecionada(valor);
+    if (valor.toLowerCase() === 'cat_padrao_outra' || valor.toLowerCase() === 'outra') {
+      setIsOutraSelected(true);
+    } else {
+      setIsOutraSelected(false);
+      setNomeOutraCategoria('');
+    }
+  };
+
+  const salvarCategoriaSeNecessario = async (): Promise<string> => {
+    if (isOutraSelected && nomeOutraCategoria.trim()) {
+      const formData = new FormData();
+      formData.append('nome', nomeOutraCategoria);
+      
+      const result = await createCategoriaAction(formData);
+      if (result.success && result.data?.categoria?.nome) {
+        await fetchCategorias();
+        return result.data.categoria.nome;
+      }
+    }
+    return categoriaSelecionada;
+  };
+
+  return {
+    categorias,
+    isLoading,
+    categoriaSelecionada,
+    nomeOutraCategoria,
+    isOutraSelected,
+    handleSelectCategoria,
+    setNomeOutraCategoria,
+    salvarCategoriaSeNecessario,
+    refetch: fetchCategorias,
+  };
 }

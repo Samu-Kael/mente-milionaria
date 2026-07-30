@@ -1,14 +1,14 @@
-// Salva os dados no objeto global para não serem apagados pelo Next.js
+// Salva os dados no objeto global
 const globalApp = global as any;
-if (!globalApp.despesasDB) globalApp.despesasDB = [];
+if (!globalApp.receitasDB) globalApp.receitasDB = [];
 
-export const DespesasRepository = {
+export const ReceitasRepository = {
   async buscarTodas() {
-    return globalApp.despesasDB;
+    return globalApp.receitasDB;
   },
 
   async criar(dados: any) {
-    const novaDespesa = {
+    const novaReceita = {
       id: dados.id || crypto.randomUUID(),
       usuarioId: dados.usuarioId || 'user-default',
       descricao: dados.descricao,
@@ -17,8 +17,8 @@ export const DespesasRepository = {
       data: dados.data || new Date().toISOString(),
       createdAt: new Date().toISOString()
     };
-    globalApp.despesasDB.push(novaDespesa);
-    return novaDespesa;
+    globalApp.receitasDB.push(novaReceita);
+    return novaReceita;
   },
 
   async salvar(dados: any) {
@@ -26,7 +26,7 @@ export const DespesasRepository = {
   },
 
   async deletar(id: string) {
-    globalApp.despesasDB = globalApp.despesasDB.filter((item: any) => item.id !== id);
+    globalApp.receitasDB = globalApp.receitasDB.filter((item: any) => item.id !== id);
     return true;
   }
 };

@@ -1,15 +1,37 @@
-import { db } from '@/infrastructure/database/db';
-import { metas } from '@/infrastructure/schemas';
-import { eq } from 'drizzle-orm';
+const globalApp = global as any;
+if (!globalApp.metasDB) globalApp.metasDB = [];
 
 export const MetasRepository = {
-  async salvar(dados: typeof metas.$inferInsert) {
-    return await db.insert(metas).values(dados).returning();
+  async buscarTodas() {
+    return globalApp.metasDB;
   },
-  async excluir(id: string) {
-    return await db.delete(metas).where(eq(metas.id, id)).returning();
+
+  async criar(dados: any) {
+    const valorObj = Number(dados.valorObjetivo || dados.valorAlvo || dados.valor || 0);
+    const novaMeta = {
+      id: dados.id || crypto.randomUUID(),
+      usuarioId: dados.usuarioId || 'user-default',
+      titulo: dados.titulo,
+      valorObjetivo: valorObj,
+      prazo: dados.prazo,
+      acumulado: Number(dados.acumulado || 0),
+      createdAt: new Date().toISOString()
+    };
+    globalApp.metasDB.push(novaMeta);
+    return novaMeta;
   },
-  async listarTodas() {
-    return await db.select().from(metas);
+
+  async deletar(id: string) {
+    globalApp.metasDB = globalApp.metasDB.filter((m: any) => m.id !== id);
+    return true;
+  },
+
+  async adicionarSaldo(id: string, valor: number) {
+    const metaIndex = globalApp.metasDB.findIndex((m: any) => m.id === id);
+    if (metaIndex !== -1) {
+      globalApp.metasDB[metaIndex].acumulado = (Number(globalApp.metasDB[metaIndex].acumulado) || 0) + Number(valor);
+      return globalApp.metasDB[metaIndex];
+    }
+    throw new Error('Meta não encontrada.');
   }
 };
