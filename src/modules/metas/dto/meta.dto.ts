@@ -1,6 +1,3 @@
-
-import { Meta } from "@/shared/types";
-
 /*export interface CreateMetaDTO {
   titulo: string;
   valorAlvo: number;
@@ -17,9 +14,9 @@ export interface Meta {
   criadoEm?: Date | null;
 }
 */
+import { Meta } from "@/shared/types";
 
-
-export type CreateMetaDTO = Omit<Meta, "id" | "criadoEm">;
+export type CreateMetaDTO = Meta
 
 
 
