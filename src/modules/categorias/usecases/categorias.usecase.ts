@@ -1,13 +1,13 @@
 import { CategoriasRepository } from '../repositories/categorias.repository';
 import { CreateCategoriaDTO } from '../dto/categoria.dto';
-import { CATEGORIAS_PADRAO } from '@/shared/constants/categorias-padrao';
+import { Categoria } from '@/shared/types';
 
 export const CategoriasUseCase = {
   async buscarTodas(usuarioId: string = 'usr_1') {
     const personalizadas = await CategoriasRepository.listarPorUsuario(usuarioId);
     
     return [
-      ...CATEGORIAS_PADRAO,
+      ...Categoria,
       ...personalizadas.map((cat: any) => ({ ...cat, isPadrao: false })),
     ];
   },
