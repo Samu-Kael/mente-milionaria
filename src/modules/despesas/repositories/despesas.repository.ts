@@ -1,32 +1,59 @@
-// Salva os dados no objeto global para não serem apagados pelo Next.js
-const globalApp = global as any;
-if (!globalApp.despesasDB) globalApp.despesasDB = [];
+import { eq } from "drizzle-orm";
+import { db } from "@/infrastructure/database/db";
+import { tabelaDespesas } from "@/infrastructure/schemas/schema-despesas";
+import { formatarDataCriacao } from "@/shared/utils/formatar-data-criacao";
+import type { CreateDespesaDTO } from "../dto/create-despesa.dto";
+import type { Despesa } from "@/shared/types/domain/despesa";
+
+type DespesaRow = typeof tabelaDespesas.$inferSelect;
+
+function mapearDespesa(row: DespesaRow): Despesa {
+  return {
+    id: row.id,
+    descricao: row.descricao,
+    valor: Number(row.valor),
+    categoria: row.categoria,
+    data: row.data,
+    criadoEm: formatarDataCriacao(row.criadoEm),
+  };
+}
 
 export const DespesasRepository = {
-  async buscarTodas() {
-    return globalApp.despesasDB;
+  async buscarTodas(): Promise<Despesa[]> {
+    const rows = await db.select().from(tabelaDespesas);
+    return rows.map(mapearDespesa);
   },
 
-  async criar(dados: any) {
-    const novaDespesa = {
-      id: dados.id || crypto.randomUUID(),
-      usuarioId: dados.usuarioId || 'user-default',
-      descricao: dados.descricao,
-      valor: Number(dados.valor),
-      categoria: dados.categoria,
-      data: dados.data || new Date().toISOString(),
-      createdAt: new Date().toISOString()
-    };
-    globalApp.despesasDB.push(novaDespesa);
-    return novaDespesa;
+  async buscarPorId(id: string): Promise<Despesa | null> {
+    const [despesa] = await db
+      .select()
+      .from(tabelaDespesas)
+      .where(eq(tabelaDespesas.id, id));
+
+    return despesa ? mapearDespesa(despesa) : null;
   },
 
-  async salvar(dados: any) {
-    return await this.criar(dados);
+  async salvar(dados: CreateDespesaDTO): Promise<Despesa> {
+    const [criada] = await db
+      .insert(tabelaDespesas)
+      .values({
+        descricao: dados.descricao,
+        valor: String(dados.valor),
+        categoria: dados.categoria,
+        data: dados.data,
+      })
+      .returning();
+
+    if (!criada) {
+      throw new Error("Não foi possível cadastrar a despesa.");
+    }
+
+    return mapearDespesa(criada);
   },
 
-  async deletar(id: string) {
-    globalApp.despesasDB = globalApp.despesasDB.filter((item: any) => item.id !== id);
-    return true;
-  }
+  async deletar(id: string): Promise<void> {
+    await db
+      .delete(tabelaDespesas)
+      .where(eq(tabelaDespesas.id, id));
+  },
 };

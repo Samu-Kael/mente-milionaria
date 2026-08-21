@@ -1,11 +1,21 @@
-import { sqliteTable, text, real } from 'drizzle-orm/sqlite-core';
+import {
+  numeric,
+  pgTable,
+  text,
+  timestamp,
+} from "drizzle-orm/pg-core";
 
-export const receitas = sqliteTable('receitas', {
-  id: text('id').primaryKey(),
-  usuarioId: text('usuario_id').notNull(),
-  descricao: text('descricao').notNull(),
-  valor: real('valor').notNull(),
-  categoria: text('categoria').notNull(),
-  data: text('data').notNull(),
-  criadoEm: text('criado_em').notNull(),
+export const tabelaReceitas = pgTable("receitas", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  descricao: text("descricao").notNull(),
+  valor: numeric("valor").notNull(),
+  categoria: text("categoria").notNull(),
+  data: text("data").notNull(),
+  criadoEm: timestamp("criado_em", {
+    withTimezone: true,
+  })
+    .defaultNow()
+    .notNull(),
 });

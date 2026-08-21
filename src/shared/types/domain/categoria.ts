@@ -1,24 +1,13 @@
-export interface Despesa {
-  descricao: string;
-  valor: number;
-  categoria: string;
-  data: string;
+export interface Categoria {
+  id: string;
+  nome: string;
+  cor: string;
+  isPadrao: boolean;
 }
 
-export interface Meta {
-  titulo: string;
-  valorAlvo: number;
-  prazo: string;
-}
+export type NovaCategoria = Omit<Categoria, "id">;
 
-export interface Receita {
-  descricao: string;
-  valor: number;
-  categoria: string;
-  data: string;
-}
-
-export const Categoria = [
+export const CATEGORIAS_PADRAO: Categoria[] = [
   { id: 'cat_padrao_1', nome: 'Alimentação', cor: '#EF4444', isPadrao: true },
   { id: 'cat_padrao_2', nome: 'Transporte', cor: '#3B82F6', isPadrao: true },
   { id: 'cat_padrao_3', nome: 'Moradia', cor: '#10B981', isPadrao: true },

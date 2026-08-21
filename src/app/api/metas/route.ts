@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { MetasHandler } from '@/modules/metas/handlers/metas.handler';
+import { MetasHandler } from '@/modules/metas/handlers/criar-meta.handler';
 
 export async function GET() {
   try {

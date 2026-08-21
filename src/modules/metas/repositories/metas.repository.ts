@@ -1,37 +1,75 @@
-const globalApp = global as any;
-if (!globalApp.metasDB) globalApp.metasDB = [];
+import { eq, sql } from "drizzle-orm";
+import { db } from "@/infrastructure/database/db";
+import { tabelaMetas } from "@/infrastructure/schemas/schema-metas";
+import { formatarDataCriacao } from "@/shared/utils/formatar-data-criacao";
+import type { CreateMetaDTO } from "../dto/create-meta.dto";
+import type { Meta } from "@/shared/types/domain/meta";
+
+type MetaRow = typeof tabelaMetas.$inferSelect;
+
+function mapearMeta(row: MetaRow): Meta {
+  return {
+    id: row.id,
+    titulo: row.titulo,
+    valorAlvo: Number(row.valorAlvo),
+    prazo: row.prazo,
+    acumulado: Number(row.acumulado),
+    criadoEm: formatarDataCriacao(row.criadoEm),
+  };
+}
 
 export const MetasRepository = {
-  async buscarTodas() {
-    return globalApp.metasDB;
+  async buscarTodas(): Promise<Meta[]> {
+    const rows = await db.select().from(tabelaMetas);
+    return rows.map(mapearMeta);
   },
 
-  async criar(dados: any) {
-    const valorObj = Number(dados.valorObjetivo || dados.valorAlvo || dados.valor || 0);
-    const novaMeta = {
-      id: dados.id || crypto.randomUUID(),
-      usuarioId: dados.usuarioId || 'user-default',
-      titulo: dados.titulo,
-      valorObjetivo: valorObj,
-      prazo: dados.prazo,
-      acumulado: Number(dados.acumulado || 0),
-      createdAt: new Date().toISOString()
-    };
-    globalApp.metasDB.push(novaMeta);
-    return novaMeta;
+  async buscarPorId(id: string): Promise<Meta | null> {
+    const [meta] = await db
+      .select()
+      .from(tabelaMetas)
+      .where(eq(tabelaMetas.id, id));
+
+    return meta ? mapearMeta(meta) : null;
   },
 
-  async deletar(id: string) {
-    globalApp.metasDB = globalApp.metasDB.filter((m: any) => m.id !== id);
-    return true;
-  },
+  async salvar(dados: CreateMetaDTO): Promise<Meta> {
+    const [criada] = await db
+      .insert(tabelaMetas)
+      .values({
+        titulo: dados.titulo,
+        valorAlvo: String(dados.valorAlvo),
+        prazo: dados.prazo,
+        acumulado: "0",
+      })
+      .returning();
 
-  async adicionarSaldo(id: string, valor: number) {
-    const metaIndex = globalApp.metasDB.findIndex((m: any) => m.id === id);
-    if (metaIndex !== -1) {
-      globalApp.metasDB[metaIndex].acumulado = (Number(globalApp.metasDB[metaIndex].acumulado) || 0) + Number(valor);
-      return globalApp.metasDB[metaIndex];
+    if (!criada) {
+      throw new Error("Não foi possível cadastrar a meta.");
     }
-    throw new Error('Meta não encontrada.');
+
+    return mapearMeta(criada);
+  },
+
+  async deletar(id: string): Promise<void> {
+    await db
+      .delete(tabelaMetas)
+      .where(eq(tabelaMetas.id, id));
+  },
+
+  async adicionarSaldo(id: string, valor: number): Promise<Meta> {
+    const [atualizada] = await db
+      .update(tabelaMetas)
+      .set({
+        acumulado: sql`${tabelaMetas.acumulado} + ${valor}`
+      })
+      .where(eq(tabelaMetas.id, id))
+      .returning();
+
+    if (!atualizada) {
+      throw new Error("Não foi possível atualizar o saldo da meta.");
+    }
+
+    return mapearMeta(atualizada);
   }
 };

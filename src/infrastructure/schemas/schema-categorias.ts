@@ -1,9 +1,20 @@
-import { sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import {
+  boolean,
+  pgTable,
+  text,
+  timestamp,
+} from "drizzle-orm/pg-core";
 
-export const categorias = sqliteTable('categorias', {
-  id: text('id').primaryKey(),
-  usuarioId: text('usuario_id').notNull(),
-  nome: text('nome').notNull(),
-  cor: text('cor'),
-  criadoEm: text('criado_em').notNull(),
+export const tabelaCategorias = pgTable("categorias", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  nome: text("nome").notNull(),
+  cor: text("cor").notNull(),
+  isPadrao: boolean("is_padrao").default(false).notNull(),
+  criadoEm: timestamp("criado_em", {
+    withTimezone: true,
+  })
+    .defaultNow()
+    .notNull(),
 });

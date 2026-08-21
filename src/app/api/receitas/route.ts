@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { ReceitasHandler } from '@/modules/receitas/handlers/receitas.handler';
+import { ReceitasHandler } from '@/modules/receitas/handlers/criar-receita.handler';
 
 export async function GET() {
   try {

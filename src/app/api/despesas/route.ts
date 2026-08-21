@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { DespesasHandler } from '@/modules/despesas/handlers/despesas.handler';
+import { DespesasHandler } from '@/modules/despesas/handlers/criar-despesa.handler';
 
 export async function GET() {
   try {
