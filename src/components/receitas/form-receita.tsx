@@ -3,62 +3,101 @@
 import { useReceitas } from '@/hooks/use-receitas';
 import { useCategorias } from '@/hooks/use-categorias';
 import { SelectCategoriaDinamico } from '../categorias/select-categoria-dinamico';
+import { useState } from 'react';
 
 export function FormReceita() {
-  const { handleCreateReceita, isSubmitting, errorMsg } = useReceitas();
+  const { adicionarReceita, salvando, erro } = useReceitas();
   const { salvarCategoriaSeNecessario } = useCategorias();
+
+  const [descricao, setDescricao] = useState('');
+  const [valor, setValor] = useState('');
+  const [data, setData] = useState('');
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
-    // 1. SALVAMOS A REFERÊNCIA IMEDIATAMENTE (Evita o erro de null)
-    const form = e.currentTarget;
-    const formData = new FormData(form);
-
-    // 2. Resolvemos a categoria personalizada
     const nomeCategoriaFinal = await salvarCategoriaSeNecessario();
+    
+    const selectElement = e.currentTarget.elements.namedItem('categoria') as HTMLSelectElement;
+    const categoriaSelecionada = nomeCategoriaFinal || selectElement.value;
 
-    // 3. Montamos o objeto de dados limpo
+    if (!categoriaSelecionada) return;
+
+   
     const novaReceita = {
-      descricao: formData.get('descricao') as string,
-      valor: Number(formData.get('valor')),
-      data: formData.get('data') as string,
-      categoria: nomeCategoriaFinal || (formData.get('categoria') as string),
+      descricao,
+      valor: Number(valor),
+      data, 
+      categoria: categoriaSelecionada, 
     };
 
-    // 4. Passamos os dados diretamente para o Hook
-    await handleCreateReceita(novaReceita, form);
+    await adicionarReceita(novaReceita);
+
+    setDescricao('');
+    setValor('');
+    setData('');
   };
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4 bg-zinc-900 p-6 rounded-lg border border-zinc-800">
-      <h2 className="text-xl font-bold text-emerald-400 mb-4">Nova Receita</h2>
+    <form onSubmit={onSubmit} className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-900 p-6">
+      <h2 className="mb-4 text-xl font-bold text-emerald-400">Nova Receita</h2>
 
-      {errorMsg && (
-        <div className="bg-red-500/10 border border-red-500/50 text-red-500 p-3 rounded text-sm">
-          {errorMsg}
+      {erro && (
+        <div className="rounded border border-red-500/50 bg-red-500/10 p-3 text-sm text-red-500">
+          {erro}
         </div>
       )}
 
       <div className="space-y-1">
         <label htmlFor="descricao" className="text-sm font-medium text-zinc-300">Descrição</label>
-        <input type="text" name="descricao" id="descricao" required className="w-full p-2 rounded-md border border-zinc-700 bg-zinc-800 text-white focus:ring-2 focus:ring-emerald-500" placeholder="Ex: Salário Mensal, Freelance" />
+        <input 
+          type="text" 
+          name="descricao" 
+          id="descricao" 
+          value={descricao}
+          onChange={(e) => setDescricao(e.target.value)}
+          required 
+          className="w-full rounded-md border border-zinc-700 bg-zinc-800 p-2 text-white focus:ring-2 focus:ring-emerald-500" 
+          placeholder="Ex: Salário Mensal, Freelance" 
+        />
       </div>
 
       <div className="space-y-1">
         <label htmlFor="valor" className="text-sm font-medium text-zinc-300">Valor (R$)</label>
-        <input type="number" step="0.01" name="valor" id="valor" required className="w-full p-2 rounded-md border border-zinc-700 bg-zinc-800 text-white focus:ring-2 focus:ring-emerald-500" placeholder="0.00" />
+        <input 
+          type="number" 
+          step="0.01" 
+          name="valor" 
+          id="valor" 
+          value={valor}
+          onChange={(e) => setValor(e.target.value)}
+          required 
+          className="w-full rounded-md border border-zinc-700 bg-zinc-800 p-2 text-white focus:ring-2 focus:ring-emerald-500" 
+          placeholder="0.00" 
+        />
       </div>
 
       <div className="space-y-1">
         <label htmlFor="data" className="text-sm font-medium text-zinc-300">Data de Recebimento</label>
-        <input type="date" name="data" id="data" required className="w-full p-2 rounded-md border border-zinc-700 bg-zinc-800 text-white focus:ring-2 focus:ring-emerald-500" />
+        <input 
+          type="date" 
+          name="data" 
+          id="data" 
+          value={data}
+          onChange={(e) => setData(e.target.value)}
+          required 
+          className="w-full rounded-md border border-zinc-700 bg-zinc-800 p-2 text-white focus:ring-2 focus:ring-emerald-500" 
+        />
       </div>
 
       <SelectCategoriaDinamico />
 
-      <button type="submit" disabled={isSubmitting} className="w-full py-2 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-md transition-colors disabled:opacity-50">
-        {isSubmitting ? 'Cadastrando...' : 'Cadastrar Receita'}
+      <button 
+        type="submit" 
+        disabled={salvando} 
+        className="w-full rounded-md bg-emerald-600 px-4 py-2 font-bold text-white transition-colors hover:bg-emerald-700 disabled:opacity-50"
+      >
+        {salvando ? 'Cadastrando...' : 'Cadastrar Receita'}
       </button>
     </form>
   );

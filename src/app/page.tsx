@@ -2,31 +2,26 @@ import Link from 'next/link';
 import { ResumoCards } from '@/components/dashboard/resumo-cards';
 import { TransacoesRecentes } from '@/components/dashboard/transacoes-recentes';
 import { PrincipaisCategorias } from '@/components/dashboard/principais-categorias';
-import { DespesasHandler } from '@/modules/despesas/handlers/criar-despesa.handler';
-import { ReceitasHandler } from '@/modules/receitas/handlers/criar-receita.handler';
-import { MetasHandler } from '@/modules/metas/handlers/criar-meta.handler';
+import { listarDespesasHandler } from '@/modules/despesas/handlers/listar-despesa.handler';
+import { listarReceitasHandler } from '@/modules/receitas/handlers/listar-receitas.handler';
+import { listarMetasHandler } from '@/modules/metas/handlers/listar-metas.handler';
 
-// Garante que o Next.js não guarde a página em cache, mostrando sempre os dados mais recentes
 export const revalidate = 0; 
 
 export default async function DashboardPage() {
-  // 1. Busca os dados reais do banco através dos Handlers
-  const despesas = await DespesasHandler.handleBuscarTodas();
-  const receitas = await ReceitasHandler.handleBuscarTodas();
-  const metas = await MetasHandler.handleBuscarTodas();
+  const despesas = await listarDespesasHandler();
+  const receitas = await listarReceitasHandler();
+  const metas = await listarMetasHandler();
 
-  // 2. Calcula os totais para os Cards Superiores
   const totalReceitas = receitas.reduce((acc: number, item: any) => acc + Number(item.valor), 0);
   const totalDespesas = despesas.reduce((acc: number, item: any) => acc + Number(item.valor), 0);
   const totalMetas = metas.length;
 
-  // 3. Junta Receitas e Despesas em uma única lista e ordena das mais recentes para as mais antigas
   const transacoesConsolidadas = [
     ...receitas.map((r: any) => ({ ...r, tipo: 'receita' as const })),
     ...despesas.map((d: any) => ({ ...d, tipo: 'despesa' as const })),
   ].sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime());
 
-  // 4. Agrupa as despesas por categoria e calcula a porcentagem exata de cada uma
   const categoriasMap = new Map<string, number>();
   
   despesas.forEach((d: any) => {
@@ -40,12 +35,11 @@ export default async function DashboardPage() {
       total,
       porcentagem: totalDespesas > 0 ? Math.round((total / totalDespesas) * 100) : 0,
     }))
-    .sort((a, b) => b.total - a.total); // Ordena quem gastou mais no topo
+    .sort((a, b) => b.total - a.total); 
 
   return (
     <main className="max-w-7xl mx-auto space-y-6">
       
-      {/* Cabeçalho com Botões de Ação Rápida */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold text-white">Dashboard</h1>
@@ -74,14 +68,12 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      {/* Cards de Resumo */}
       <ResumoCards 
         totalReceitas={totalReceitas} 
         totalDespesas={totalDespesas} 
         totalMetas={totalMetas} 
       />
 
-      {/* Grid Principal (Transações e Gráfico de Categorias) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
           <TransacoesRecentes transacoes={transacoesConsolidadas} />

@@ -1,35 +1,24 @@
-import { NextResponse } from 'next/server';
-import { DespesasHandler } from '@/modules/despesas/handlers/criar-despesa.handler';
+import { NextRequest, NextResponse } from 'next/server';
+import { criarDespesaHandler } from '@/modules/despesas/handlers/criar-despesa.handler';
+import { listarDespesasHandler } from '@/modules/despesas/handlers/listar-despesa.handler';
 
 export async function GET() {
   try {
-    const dados = await DespesasHandler.handleBuscarTodas();
+    const dados = await listarDespesasHandler();
     return NextResponse.json(dados ?? []);
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message || 'Erro ao buscar despesas' }, { status: 500 });
+  } catch (erro: unknown) {
+    const mensagem = erro instanceof Error ? erro.message : 'Erro ao buscar despesas';
+    return NextResponse.json({ mensagem }, { status: 500 });
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(req: NextRequest) {
   try {
-    const body = await request.json();
-    const resultado = await DespesasHandler.handleCriar(body);
+    const body = await req.json();
+    const resultado = await criarDespesaHandler(body);
     return NextResponse.json(resultado, { status: 201 });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message || 'Erro ao criar despesa' }, { status: 400 });
-  }
-}
-
-export async function DELETE(request: Request) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const id = searchParams.get('id');
-
-    if (!id) return NextResponse.json({ error: 'ID não informado' }, { status: 400 });
-
-    await DespesasHandler.handleDeletar(id);
-    return NextResponse.json({ success: true });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message || 'Erro ao deletar despesa' }, { status: 500 });
+  } catch (erro: unknown) {
+    const mensagem = erro instanceof Error ? erro.message : 'Erro ao criar despesa';
+    return NextResponse.json({ mensagem }, { status: 400 });
   }
 }

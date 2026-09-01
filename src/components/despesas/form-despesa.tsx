@@ -9,7 +9,6 @@ export function FormDespesa() {
   const { adicionarDespesa, salvando, erro } = useDespesas();
   const { salvarCategoriaSeNecessario } = useCategorias();
 
-  // Usar estados controlados é mais confiável com a arquitetura do React
   const [descricao, setDescricao] = useState('');
   const [valor, setValor] = useState('');
   const [data, setData] = useState('');
@@ -17,10 +16,8 @@ export function FormDespesa() {
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
-    // Resolvemos a categoria personalizada
     const nomeCategoriaFinal = await salvarCategoriaSeNecessario();
     
-    // Se não tiver categoria selecionada (e não for 'Outra'), o formulário não deve avançar
     const selectElement = e.currentTarget.elements.namedItem('categoria') as HTMLSelectElement;
     const categoriaSelecionada = nomeCategoriaFinal || selectElement.value;
 
@@ -29,13 +26,12 @@ export function FormDespesa() {
     const novaDespesa = {
       descricao,
       valor: Number(valor),
-      data: new Date(data),
-      categoriaId: categoriaSelecionada, // Assumindo que agora salvamos o ID
+      data, 
+      categoria: categoriaSelecionada,
     };
 
     await adicionarDespesa(novaDespesa);
 
-    // Limpar form após sucesso
     setDescricao('');
     setValor('');
     setData('');
