@@ -1,6 +1,6 @@
 'use client';
 
-import { useMetas } from '@/hooks/metas/use-metas';
+import { useMetas } from '@/hooks/use-metas';
 
 export function ListaMetas() {
   const { metas, isLoading, handleDeleteMeta } = useMetas();

@@ -1,17 +1,7 @@
-export async function getMetasAction() {
-  try {
-    const response = await fetch('/api/metas', {
-      method: 'GET',
-      cache: 'no-store',
-    });
+import type { Meta } from "@/shared/types/domain/meta";
 
-    if (!response.ok) {
-      throw new Error('Erro ao buscar metas');
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error('Erro na action getMetasAction:', error);
-    return [];
-  }
+export async function getMetasAction(): Promise<Meta[]> {
+  const resposta = await fetch("/api/metas");
+  if (!resposta.ok) throw new Error("Erro ao buscar metas");
+  return resposta.json();
 }

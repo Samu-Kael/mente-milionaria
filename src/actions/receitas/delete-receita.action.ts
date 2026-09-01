@@ -1,18 +1,10 @@
-export async function deleteReceitaAction(id: string) {
-  try {
-    const response = await fetch(`/api/receitas?id=${id}`, {
-      method: 'DELETE',
-    });
+import type { Receita } from "@/shared/types/domain/receita";
 
-    const result = await response.json();
-
-    if (!response.ok) {
-      return { success: false, error: result.error || 'Erro ao deletar receita' };
-    }
-
-    return { success: true };
-  } catch (error) {
-    console.error('Erro na action deleteReceitaAction:', error);
-    return { success: false, error: 'Erro de conexão ao deletar receita' };
-  }
+export async function deleteReceitaAction(
+  listaAtual: Receita[],
+  id: string
+): Promise<Receita[]> {
+  const resposta = await fetch(`/api/receitas/${id}`, { method: "DELETE" });
+  if (!resposta.ok) throw new Error("Erro ao remover receita");
+  return listaAtual.filter((r) => r.id !== id);
 }

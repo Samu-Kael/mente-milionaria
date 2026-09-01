@@ -1,7 +1,7 @@
 'use client';
 
-import { useReceitas } from '@/hooks/receitas/use-receitas';
-import { useCategorias } from '@/hooks/categorias/use-categorias';
+import { useReceitas } from '@/hooks/use-receitas';
+import { useCategorias } from '@/hooks/use-categorias';
 import { SelectCategoriaDinamico } from '../categorias/select-categoria-dinamico';
 
 export function FormReceita() {

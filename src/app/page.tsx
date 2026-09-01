@@ -1,7 +1,7 @@
 import Link from 'next/link';
-import { ResumoCards } from '@/components/features/dashboard/resumo-cards';
-import { TransacoesRecentes } from '@/components/features/dashboard/transacoes-recentes';
-import { PrincipaisCategorias } from '@/components/features/dashboard/principais-categorias';
+import { ResumoCards } from '@/components/dashboard/resumo-cards';
+import { TransacoesRecentes } from '@/components/dashboard/transacoes-recentes';
+import { PrincipaisCategorias } from '@/components/dashboard/principais-categorias';
 import { DespesasHandler } from '@/modules/despesas/handlers/criar-despesa.handler';
 import { ReceitasHandler } from '@/modules/receitas/handlers/criar-receita.handler';
 import { MetasHandler } from '@/modules/metas/handlers/criar-meta.handler';

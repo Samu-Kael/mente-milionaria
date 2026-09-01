@@ -1,7 +1,7 @@
 'use client';
 
-import { useReceitas } from '@/hooks/receitas/use-receitas';
-import { FormReceita } from '@/components/features/receitas/form-receita';
+import { useReceitas } from '@/hooks/use-receitas';
+import { FormReceita } from '@/components/receitas/form-receita';
 
 export default function ReceitasPage() {
   const { receitas, isLoading, handleDeleteReceita } = useReceitas();

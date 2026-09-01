@@ -1,7 +1,7 @@
 'use client';
 
-import { useDespesas } from '@/hooks/despesas/use-despesas';
-import { FormDespesa } from '@/components/features/despesas/form-despesa';
+import { useDespesas } from '@/hooks/use-despesas';
+import { FormDespesa } from '@/components/despesas/form-despesa';
 
 export default function DespesasPage() {
   const { despesas, isLoading, handleDeleteDespesa } = useDespesas();

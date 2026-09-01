@@ -1,7 +1,7 @@
 'use client';
 
-import { useMetas } from '@/hooks/metas/use-metas';
-import { FormMeta } from '@/components/features/metas/form-meta';
+import { useMetas } from '@/hooks/use-metas';
+import { FormMeta } from '@/components/metas/form-meta';
 
 export default function MetasPage() {
   const { metas, isLoading, handleDeleteMeta, handleAddSaldo } = useMetas();

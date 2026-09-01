@@ -1,17 +1,7 @@
-export async function getDespesasAction() {
-  try {
-    const response = await fetch('/api/despesas', {
-      method: 'GET',
-      cache: 'no-store',
-    });
+import type { Despesa } from "@/shared/types/domain/despesa";
 
-    if (!response.ok) {
-      throw new Error('Erro ao buscar despesas');
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error('Erro na action getDespesasAction:', error);
-    return [];
-  }
+export async function getDespesasAction(): Promise<Despesa[]> {
+  const resposta = await fetch("/api/despesas");
+  if (!resposta.ok) throw new Error("Erro ao buscar despesas");
+  return resposta.json();
 }

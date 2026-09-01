@@ -1,25 +1,21 @@
-export async function createCategoriaAction(formData: FormData) {
-  try {
-    const data = {
-      nome: formData.get('nome') as string,
-      cor: formData.get('cor') as string,
-    };
+import type { Categoria } from "@/shared/types/domain/categoria";
+import type { CreateCategoriaDTO } from "@/modules/categorias/dto/create-categoria.dto";
 
-    const response = await fetch('/api/categorias', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-    });
+export async function createCategoriaAction(
+  listaAtual: Categoria[],
+  dados: CreateCategoriaDTO
+): Promise<Categoria[]> {
+  const resposta = await fetch("/api/categorias", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(dados),
+  });
 
-    const result = await response.json();
-
-    if (!response.ok) {
-      return { success: false, error: result.error || 'Erro ao criar categoria' };
-    }
-
-    return { success: true, data: result };
-  } catch (error) {
-    console.error('Erro na action createCategoriaAction:', error);
-    return { success: false, error: 'Erro de conexão ao criar categoria' };
+  if (!resposta.ok) {
+    const erro = await resposta.json();
+    throw new Error(erro.mensagem ?? "Erro ao criar categoria");
   }
+
+  const novaCategoria: Categoria = await resposta.json();
+  return [...listaAtual, novaCategoria];
 }

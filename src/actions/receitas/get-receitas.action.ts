@@ -1,17 +1,7 @@
-export async function getReceitasAction() {
-  try {
-    const response = await fetch('/api/receitas', {
-      method: 'GET',
-      cache: 'no-store',
-    });
+import type { Receita } from "@/shared/types/domain/receita";
 
-    if (!response.ok) {
-      throw new Error('Erro ao buscar receitas');
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error('Erro na action getReceitasAction:', error);
-    return [];
-  }
+export async function getReceitasAction(): Promise<Receita[]> {
+  const resposta = await fetch("/api/receitas");
+  if (!resposta.ok) throw new Error("Erro ao buscar receitas");
+  return resposta.json();
 }

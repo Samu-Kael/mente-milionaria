@@ -1,26 +1,21 @@
-export async function createMetaAction(formData: FormData) {
-  try {
-    const data = {
-      titulo: formData.get('titulo') as string,
-      valorAlvo: Number(formData.get('valorAlvo')),
-      prazo: formData.get('prazo') as string,
-    };
+import type { Meta } from "@/shared/types/domain/meta";
+import type { CreateMetaDTO } from "@/modules/metas/dto/create-meta.dto";
 
-    const response = await fetch('/api/metas', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-    });
+export async function createMetaAction(
+  listaAtual: Meta[],
+  dados: CreateMetaDTO
+): Promise<Meta[]> {
+  const resposta = await fetch("/api/metas", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(dados),
+  });
 
-    const result = await response.json();
-
-    if (!response.ok) {
-      return { success: false, error: result.error || 'Erro ao criar meta' };
-    }
-
-    return { success: true, data: result };
-  } catch (error) {
-    console.error('Erro na action createMetaAction:', error);
-    return { success: false, error: 'Erro de conexão ao criar meta' };
+  if (!resposta.ok) {
+    const erro = await resposta.json();
+    throw new Error(erro.mensagem ?? "Erro ao criar meta");
   }
+
+  const novaMeta: Meta = await resposta.json();
+  return [...listaAtual, novaMeta];
 }

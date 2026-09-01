@@ -1,17 +1,7 @@
-export async function getCategoriasUnificadasAction() {
-  try {
-    const response = await fetch('/api/categorias', {
-      method: 'GET',
-      cache: 'no-store',
-    });
+import type { Categoria } from "@/shared/types/domain/categoria";
 
-    if (!response.ok) {
-      throw new Error('Erro ao buscar categorias');
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error('Erro na action getCategoriasUnificadasAction:', error);
-    return [];
-  }
+export async function getCategoriasAction(): Promise<Categoria[]> {
+  const resposta = await fetch("/api/categorias");
+  if (!resposta.ok) throw new Error("Erro ao buscar categorias");
+  return resposta.json();
 }
